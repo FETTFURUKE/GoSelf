@@ -1,0 +1,3434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoSelf — Sistema de Autoatendimento Frente de Caixa (Totem PDV)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-kiosk: #090d16;
+      --bg-viewport: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --bg-input: #ffffff;
+      --border-light: #e2e8f0;
+      --border-default: #cbd5e1;
+      --border-dark: #334155;
+      --brand-navy: #0f172a;
+      --brand-navy-light: #1e293b;
+      --brand-emerald: #10b981;
+      --brand-emerald-dark: #059669;
+      --brand-emerald-subtle: #ecfdf5;
+      --brand-blue: #2563eb;
+      --brand-blue-subtle: #eff6ff;
+      --brand-amber: #f59e0b;
+      --brand-amber-dark: #d97706;
+      --brand-amber-subtle: #fffbeb;
+      --brand-danger: #ef4444;
+      --brand-danger-dark: #dc2626;
+      --brand-danger-subtle: #fef2f2;
+      --text-main: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.06);
+      --shadow-modal: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    input, textarea, select {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at 50% 10%, #1e293b 0%, #090d16 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 10px 16px 20px;
+      overflow-x: hidden;
+    }
+
+    .presenter-console {
+      width: 100%;
+      max-width: 1400px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 8px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: #f8fafc;
+      font-size: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      z-index: 100;
+    }
+
+    .presenter-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--brand-emerald);
+      box-shadow: 0 0 8px var(--brand-emerald);
+    }
+
+    .status-dot.danger {
+      background: var(--brand-danger);
+      box-shadow: 0 0 8px var(--brand-danger);
+    }
+
+    .status-dot.warning {
+      background: var(--brand-amber);
+      box-shadow: 0 0 8px var(--brand-amber);
+      animation: pulseWarning 1.2s infinite ease-in-out;
+    }
+
+    @keyframes pulseWarning {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+    }
+
+    .presenter-nav {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .nav-btn:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+
+    .nav-btn.active {
+      background: var(--brand-emerald);
+      color: #052e16;
+      border-color: #34d399;
+      font-weight: 800;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+
+    .presenter-simulators {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sim-btn {
+      background: #334155;
+      color: #f1f5f9;
+      border: 1px solid #475569;
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sim-btn:hover {
+      background: #475569;
+    }
+
+    .kiosk-viewport {
+      width: 100%;
+      max-width: 1400px;
+      height: 800px;
+      background: var(--bg-viewport);
+      border: 2px solid #334155;
+      border-radius: 18px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 8px rgba(30, 41, 59, 0.7);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kiosk-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-light);
+      padding: 10px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      z-index: 20;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--brand-navy);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 17px;
+      letter-spacing: -0.05em;
+    }
+
+    .brand-name {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--brand-navy);
+      letter-spacing: -0.03em;
+    }
+
+    .header-step-tracker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      transition: all 0.2s;
+    }
+
+    .step-badge .num {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      color: #1e293b;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .step-badge.active {
+      background: var(--brand-emerald-subtle);
+      color: var(--brand-emerald-dark);
+      font-weight: 800;
+      border: 1px solid #a7f3d0;
+    }
+
+    .step-badge.active .num {
+      background: var(--brand-emerald);
+      color: #ffffff;
+    }
+
+    .step-badge.done {
+      background: #f1f5f9;
+      color: var(--brand-navy);
+    }
+
+    .step-badge.done .num {
+      background: var(--brand-navy);
+      color: #ffffff;
+    }
+
+    .header-telemetry {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .header-clock {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-main);
+      font-weight: 700;
+      background: var(--bg-subtle);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+    }
+
+    .kiosk-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-viewport);
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      padding: 24px 36px;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+    }
+
+    .screen.active {
+      display: flex;
+      animation: screenFadeIn 0.16s ease-out;
+    }
+
+    @keyframes screenFadeIn {
+      from { opacity: 0.7; transform: translateY(2px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn {
+      font-family: inherit;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      border: 1.5px solid transparent;
+      padding: 12px 20px;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.14s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: var(--brand-navy);
+      color: #ffffff;
+      border-color: var(--brand-navy);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--brand-navy-light);
+    }
+
+    .btn-emerald {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border-color: #059669;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-emerald:hover:not(:disabled) {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: var(--text-main);
+      border-color: var(--border-default);
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background: var(--bg-subtle);
+      border-color: var(--text-secondary);
+    }
+
+    .btn-danger {
+      background: var(--brand-danger-subtle);
+      color: var(--brand-danger-dark);
+      border-color: #fca5a5;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: #fee2e2;
+      border-color: #f87171;
+    }
+
+    .t01-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-between;
+    }
+
+    .t01-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .t01-hero-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 22px;
+      text-align: center;
+    }
+
+    .t01-card-start {
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 44px 54px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      max-width: 620px;
+      width: 100%;
+    }
+
+    .t01-big-btn {
+      width: 440px;
+      height: 124px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      border: 2px solid #0f172a;
+      border-radius: 20px;
+      font-family: inherit;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.28);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .t01-big-btn:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      border-color: #047857;
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 20px 42px rgba(16, 185, 129, 0.35);
+    }
+
+    .t01-big-btn span.tagline {
+      font-size: 13px;
+      font-weight: 700;
+      color: #34d399;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .t01-bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .t01-lang-box {
+      background: #ffffff;
+      border: 1.5px solid var(--border-default);
+      border-radius: 12px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .t02-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 16px;
+    }
+
+    .t02-cpf-card {
+      width: 540px;
+      background: #ffffff;
+      border: 1.5px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .t02-card-header {
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      padding: 16px 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .t02-card-header h2 {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--brand-navy);
+    }
+
+    .t02-mandatory-pill {
+      display: inline-block;
+      margin-top: 5px;
+      background: var(--brand-emerald-subtle);
+      color: var(--brand-emerald-dark);
+      border: 1px solid #a7f3d0;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.03em;
+    }
+
+    .t02-card-body {
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .t02-cpf-display {
+      width: 100%;
+      background: #f8fafc;
+      border: 2px solid var(--brand-navy);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 26px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 0.06em;
+      color: var(--brand-navy);
+      box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.04);
+    }
+
+    .t02-cpf-display.invalid {
+      border-color: var(--brand-danger);
+      background: var(--brand-danger-subtle);
+      color: var(--brand-danger-dark);
+    }
+
+    .t02-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+
+    .key-btn {
+      background: #ffffff;
+      border: 1.5px solid var(--border-default);
+      border-radius: 10px;
+      height: 48px;
+      font-family: inherit;
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.1s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .key-btn:hover {
+      background: var(--bg-subtle);
+      border-color: var(--brand-navy);
+    }
+
+    .key-btn:active {
+      transform: scale(0.97);
+    }
+
+    .t03-top-actions {
+      display: grid;
+      grid-template-columns: 210px 1fr 220px 170px;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .barcode-input-container {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 2px solid var(--brand-navy);
+      border-radius: 12px;
+      padding: 6px 16px;
+      height: 52px;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .barcode-input-container input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+      background: transparent;
+    }
+
+    .barcode-svg-icon {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: -1.5px;
+      color: var(--brand-navy);
+      background: var(--bg-subtle);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .t03-grid-main {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 22px;
+      flex: 1;
+      min-height: 0;
+      margin-bottom: 14px;
+    }
+
+    .cart-column {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-top: 16px;
+      min-height: 0;
+    }
+
+    .pill-header {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--brand-navy);
+      color: #ffffff;
+      border-radius: 999px;
+      padding: 5px 30px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      z-index: 2;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cart-box-table {
+      flex: 1;
+      background: #ffffff;
+      border: 1.5px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 24px 18px 12px;
+      overflow-y: auto;
+      box-shadow: var(--shadow-md);
+    }
+
+    .cart-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .cart-table th {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--border-default);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .cart-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-light);
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    .cart-table tbody tr:hover {
+      background: var(--bg-subtle);
+    }
+
+    .cart-table tbody tr.selected {
+      background: #fee2e2;
+      outline: 1.5px solid #ef4444;
+    }
+
+    .thumb-cell {
+      width: 36px;
+      height: 32px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--brand-navy);
+    }
+
+    .qty-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .qty-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      border: 1px solid var(--border-default);
+      background: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty-btn:hover {
+      background: var(--bg-subtle);
+    }
+
+    .summary-box {
+      flex: 1;
+      background: #ffffff;
+      border: 1.5px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 30px 22px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-md);
+    }
+
+    .summary-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border-light);
+    }
+
+    .total-card-highlight {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 21px;
+      font-weight: 900;
+      box-shadow: var(--shadow-md);
+    }
+
+    .t03-bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .catalog-search {
+      width: 100%;
+      max-width: 960px;
+      margin: 6px auto;
+      background: #ffffff;
+      border: 1.5px solid var(--border-default);
+      border-radius: 10px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .catalog-search input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .catalog-tabs {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .catalog-tab {
+      padding: 7px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border-default);
+      background: #ffffff;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .catalog-tab.active {
+      background: var(--brand-navy);
+      border-color: var(--brand-navy);
+      color: #ffffff;
+    }
+
+    .catalog-grid {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      flex: 1;
+    }
+
+    .catalog-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-light);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.14s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .catalog-card:hover {
+      border-color: var(--brand-navy);
+      transform: translateY(-2px);
+    }
+
+    .catalog-card.selected {
+      border-color: var(--brand-emerald);
+      background: var(--brand-emerald-subtle);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+
+    .scale-card {
+      width: 720px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1.5px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      padding: 26px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .scale-plate-visual {
+      width: 380px;
+      height: 110px;
+      background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+      border: 2px solid #94a3b8;
+      border-radius: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--brand-navy);
+      gap: 6px;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 6px 12px rgba(15, 23, 42, 0.08);
+    }
+
+    .scale-digital-display {
+      width: 520px;
+      background: var(--brand-navy);
+      color: #34d399;
+      border: 2px solid #1e293b;
+      border-radius: 12px;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 24px;
+      font-weight: 800;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .pay-adaptive-container {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 24px;
+      width: 100%;
+      max-width: 1120px;
+      margin: 12px auto;
+      flex: 1;
+      align-items: stretch;
+    }
+
+    .pay-active-panel {
+      background: #ffffff;
+      border: 2px solid var(--brand-emerald);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow: 0 10px 25px -4px rgba(16, 185, 129, 0.12);
+      transition: all 0.2s ease;
+    }
+
+    .pay-summary-panel {
+      background: #ffffff;
+      border: 1.5px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-md);
+    }
+
+    .qr-frame {
+      width: 180px;
+      height: 180px;
+      background: #ffffff;
+      border: 2px solid var(--brand-navy);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      margin: 14px 0;
+    }
+
+    .pinpad-interactive-terminal {
+      width: 220px;
+      background: #0f172a;
+      border: 3px solid #1e293b;
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      color: #ffffff;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.4);
+      margin: 12px auto;
+    }
+
+    .pinpad-screen {
+      background: #022c22;
+      color: #34d399;
+      border: 1.5px solid #059669;
+      border-radius: 8px;
+      padding: 10px 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 0.05em;
+      min-height: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+    }
+
+    .pinpad-pin-dots {
+      letter-spacing: 6px;
+      font-size: 16px;
+      color: #a7f3d0;
+      margin-top: 4px;
+      min-height: 20px;
+    }
+
+    .pinpad-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .pinpad-keypad button {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 8px 0;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .pinpad-keypad button:hover {
+      background: #334155;
+      border-color: #475569;
+    }
+
+    .pinpad-keypad button:active {
+      transform: scale(0.96);
+    }
+
+    .pinpad-keypad button.key-correct {
+      background: #78350f;
+      color: #fde68a;
+      border-color: #b45309;
+      font-size: 10px;
+    }
+
+    .pinpad-keypad button.key-ok {
+      background: #065f46;
+      color: #a7f3d0;
+      border-color: #059669;
+      font-size: 10px;
+    }
+
+    .eval-card-gold {
+      width: 700px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+      border: 2px solid #f59e0b;
+      border-radius: var(--radius-xl);
+      padding: 30px 40px;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(245, 158, 11, 0.16);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .star-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .star-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      border: 2px solid #fcd34d;
+      background: #fef3c7;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .star-btn svg {
+      width: 32px;
+      height: 32px;
+      fill: #d97706;
+      opacity: 0.35;
+    }
+
+    .star-btn.active {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border-color: #b45309;
+      transform: scale(1.06);
+    }
+
+    .star-btn.active svg {
+      fill: #ffffff;
+      opacity: 1;
+    }
+
+    .tag-chip {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border-default);
+      background: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .tag-chip.selected {
+      background: var(--brand-emerald);
+      border-color: var(--brand-emerald-dark);
+      color: #ffffff;
+    }
+
+    .receipt-paper {
+      width: 500px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 2px dashed #94a3b8;
+      border-radius: 14px;
+      padding: 22px 28px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: modalFade 0.15s ease-out;
+    }
+
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-dialog {
+      background: #ffffff;
+      border-radius: var(--radius-xl);
+      padding: 28px 32px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: var(--shadow-modal);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+      border: 2px solid var(--border-default);
+    }
+
+    .kiosk-toast {
+      position: absolute;
+      bottom: 24px;
+      right: 28px;
+      background: var(--brand-navy);
+      color: #ffffff;
+      border-left: 5px solid var(--brand-emerald);
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+      display: none;
+      z-index: 100;
+      max-width: 420px;
+    }
+  </style>
+</head>
+<body>
+
+  <div style="width: 100%; max-width: 1400px; display: flex; justify-content: flex-end; margin-bottom: 4px;">
+    <button id="btnTogglePresenter" onclick="togglePresenterConsole()" style="background: rgba(15, 23, 42, 0.85); color: #94a3b8; border: 1px solid #334155; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;">
+      <span>⚙ Console Demo (Avaliador)</span>
+      <span id="presenterToggleIcon">▼</span>
+    </button>
+  </div>
+
+  <header class="presenter-console" id="presenterConsole" style="display: none;">
+    <div class="presenter-left">
+      <span class="status-badge"><span class="status-dot" id="andonDot"></span> Totem #03 Online</span>
+      <span style="font-weight:700;">GoSelf v4.0 • Modo Apresentação MOSI (SENAI)</span>
+    </div>
+
+    <nav class="presenter-nav" id="quickNav">
+      <button class="nav-btn active" onclick="navigate('s01')">1. Início</button>
+      <button class="nav-btn" onclick="navigate('s02')">2. CPF Obrigatório</button>
+      <button class="nav-btn" onclick="navigate('s03')">3. Carrinho &amp; Balança</button>
+      <button class="nav-btn" onclick="navigate('s04')">4. Catálogo PLU</button>
+      <button class="nav-btn" onclick="navigate('s05')">5. Balança Toledo</button>
+      <button class="nav-btn" onclick="navigate('s06')">6. Pagamentos</button>
+      <button class="nav-btn" onclick="navigate('s07')">7. Avaliação</button>
+      <button class="nav-btn" onclick="navigate('s08')">8. Cupom NFC-e</button>
+      <a href="admin.html" target="_blank" class="nav-btn" style="background:#0f172a; color:#38bdf8; font-weight:800; border:1px solid #38bdf8; text-decoration:none; display:inline-flex; align-items:center; gap:5px;" title="Abrir Sistema Separado de Backoffice">
+        ↗ Portal Backoffice (admin.html)
+      </a>
+    </nav>
+
+    <div class="presenter-simulators">
+      <button class="sim-btn" onclick="triggerDivergenceTest()" title="Demonstrar RN-003 / RF-041">⚠️ Testar Divergência</button>
+      <button class="sim-btn" onclick="triggerAlcoholScan()" title="Demonstrar RN-018: Álcool 18+">🔞 Testar Álcool 18+</button>
+      <button class="sim-btn" onclick="toggleAudio()" id="btnAudioToggle">🔊 Som: ON</button>
+    </div>
+  </header>
+
+  <main class="kiosk-viewport" id="kioskViewport">
+
+    <div class="kiosk-header">
+      <div class="brand-group">
+        <div class="brand-logo-icon">GS</div>
+        <div class="brand-name">GoSelf</div>
+      </div>
+
+      <div class="header-step-tracker" id="stepTracker">
+        <div class="step-badge active" id="st-1"><span class="num">1</span> <span data-i18n="step_start">Início</span></div>
+        <div class="step-badge" id="st-2"><span class="num">2</span> <span data-i18n="step_cpf">CPF Obrigatório</span></div>
+        <div class="step-badge" id="st-3"><span class="num">3</span> <span data-i18n="step_cart">Carrinho</span></div>
+        <div class="step-badge" id="st-4"><span class="num">4</span> <span data-i18n="step_pay">Pagamento</span></div>
+        <div class="step-badge" id="st-5"><span class="num">5</span> <span data-i18n="step_eval">Avaliação</span></div>
+        <div class="step-badge" id="st-6"><span class="num">6</span> <span data-i18n="step_receipt">Comprovante</span></div>
+      </div>
+
+      <div class="header-telemetry">
+        <span id="activeCpfHeader" style="font-weight:700; color:var(--brand-emerald-dark); display:none;">CPF: 529.***.***-25</span>
+        <span class="header-clock" id="clockLive">20:45:00</span>
+      </div>
+    </div>
+
+    <div class="kiosk-main">
+
+      <section class="screen active" id="s01">
+        <div class="t01-container">
+          <div class="t01-top-bar" style="justify-content: flex-end;">
+            <span style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em;">
+              SUPERMERCADO GOSELF &bull; TERMINAL INTELIGENTE DE AUTOATENDIMENTO
+            </span>
+          </div>
+
+          <div class="t01-hero-center">
+            <div class="t01-card-start">
+              <div style="font-size:38px; font-weight:900; color:var(--brand-navy); letter-spacing:-0.03em;">GoSelf</div>
+              <p style="font-size:16px; color:var(--text-secondary); font-weight:600; line-height:1.4;" id="t01WelcomeDesc">
+                Bem-vindo ao checkout inteligente.<br/>
+                Para iniciar suas compras, identifique-se com seu CPF.
+              </p>
+
+              <button class="t01-big-btn" onclick="navigate('s02')">
+                <span data-i18n="t01_btn_start">INICIAR COMPRA</span>
+                <span class="tagline" data-i18n="t01_btn_tagline">Identifique-se com seu CPF para liberar o leitor</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="t01-bottom-bar">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div class="t01-lang-box">
+                <span style="font-size:13px; font-weight:700;" data-i18n="t01_lang">Idioma:</span>
+                <select id="langSelect" onchange="changeLanguage(this.value)" style="padding:4px 8px; border-radius:6px; font-weight:700; border:1px solid var(--border-default); cursor:pointer;">
+                  <option value="PT">Português (Brasil)</option>
+                  <option value="EN">English</option>
+                  <option value="ES">Español</option>
+                </select>
+              </div>
+              <button class="btn btn-outline" style="font-size:12px; padding:7px 12px;" onclick="requestAttendantHelp('Dúvida na tela inicial')" data-i18n="t01_help">
+                Precisa de ajuda? Chamar Atendente
+              </button>
+            </div>
+
+            <div style="font-size:11px; color:var(--text-muted); font-weight:600;" data-i18n="t01_legal">
+              Conforme Lei Federal 12.741/12 &bull; SEFAZ NFC-e Conectada
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s02">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn btn-outline" style="padding:8px 14px;" onclick="navigate('s01')">&larr; Voltar ao Início</button>
+          <div style="font-size:18px; font-weight:900; color:var(--brand-navy);">IDENTIFICAÇÃO OBRIGATÓRIA DO CONSUMIDOR</div>
+          <div style="width:130px;"></div>
+        </div>
+
+        <div class="t02-center">
+          <div class="t02-cpf-card">
+            <div class="t02-card-header">
+              <h2>Insira seu CPF abaixo</h2>
+              <span class="t02-mandatory-pill">RF-001 / RN-002: CPF OBRIGATÓRIO PARA LIBERAR O CHECKOUT</span>
+            </div>
+
+            <div class="t02-card-body">
+              <div class="t02-cpf-display" id="cpfDisplay">___ . ___ . ___ - __</div>
+              <div id="cpfErrorMsg" style="font-size:12px; font-weight:700; color:var(--brand-danger-dark); display:none;">
+                CPF inválido pelo Módulo 11 da Receita Federal. Verifique os dígitos.
+              </div>
+
+              <div class="t02-keypad">
+                <button class="key-btn" onclick="pressCpfDigit('1')">1</button>
+                <button class="key-btn" onclick="pressCpfDigit('2')">2</button>
+                <button class="key-btn" onclick="pressCpfDigit('3')">3</button>
+                <button class="key-btn" onclick="pressCpfDigit('4')">4</button>
+                <button class="key-btn" onclick="pressCpfDigit('5')">5</button>
+                <button class="key-btn" onclick="pressCpfDigit('6')">6</button>
+                <button class="key-btn" onclick="pressCpfDigit('7')">7</button>
+                <button class="key-btn" onclick="pressCpfDigit('8')">8</button>
+                <button class="key-btn" onclick="pressCpfDigit('9')">9</button>
+                <button class="key-btn" style="font-size:12px; color:var(--brand-danger);" onclick="clearCpfInput()">LIMPAR</button>
+                <button class="key-btn" onclick="pressCpfDigit('0')">0</button>
+                <button class="key-btn" style="font-size:12px;" onclick="backspaceCpfDigit()">APAGAR</button>
+              </div>
+
+              <div style="width:100%; border-top:1px dashed var(--border-default); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">Vai usar sacola própria?</span>
+                <button class="btn btn-outline" style="padding:6px 12px; font-size:11px;" id="btnTaraPropria" onclick="toggleCustomerBag()">
+                  Tarar Sacola na Balança (0g)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="width:540px; display:flex; gap:12px;">
+            <button class="btn btn-emerald" style="flex:1; height:54px; font-size:16px;" id="btnSubmitCpf" disabled onclick="validateAndOpenCart()">
+              Validar CPF e Iniciar Compra &rarr;
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn btn-outline" style="font-size:12px; padding:7px 12px;" onclick="requestAttendantHelp('Dificuldade com CPF')">
+            Precisa de ajuda?
+          </button>
+          <span style="font-size:11px; color:var(--text-muted);">
+            Dica: você também pode digitar os números direto pelo teclado físico do seu PC!
+          </span>
+        </div>
+      </section>
+
+      <section class="screen" id="s03">
+        <div class="t03-top-actions">
+          <button class="btn btn-primary" onclick="openManualCodeModal()">+ Adicionar Item</button>
+
+          <div class="barcode-input-container">
+            <input type="text" id="inputBarcodeLive" placeholder="Digite ou escaneie o código de barras (EAN-13)..." onkeydown="if(event.key==='Enter') handleBarcodeInput(this.value)" />
+            <span class="barcode-svg-icon">|||||||</span>
+          </div>
+
+          <button class="btn btn-emerald" onclick="navigate('s04')">
+            Pesar Produto (PLU)
+          </button>
+
+          <div style="text-align:right;">
+            <div style="font-size:11px; font-weight:800; color:var(--brand-emerald-dark);" id="customerBadge">CPF VINCULADO</div>
+            <div style="font-size:12px; font-weight:600; color:var(--text-muted);" id="customerNameBadge">Cliente Identificado</div>
+          </div>
+        </div>
+
+        <div class="t03-grid-main">
+          <div class="cart-column">
+            <div class="pill-header">CARRINHO</div>
+            <div class="cart-box-table">
+              <table class="cart-table">
+                <thead>
+                  <tr>
+                    <th>IMG</th>
+                    <th>Cód.</th>
+                    <th>Nome do Produto</th>
+                    <th>Valor</th>
+                    <th>Qtd / Peso</th>
+                    <th>SubTotal</th>
+                  </tr>
+                </thead>
+                <tbody id="cartTableRows">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="cart-column">
+            <div class="pill-header">RESUMO</div>
+            <div class="summary-box">
+              <div class="summary-lines">
+                <div class="summary-row">
+                  <span style="color:var(--text-muted);">Subtotal dos Itens</span>
+                  <span id="lblSubtotal">R$ 0,00</span>
+                </div>
+                <div class="summary-row" style="color:var(--brand-emerald-dark);">
+                  <span>Descontos Clube GoSelf</span>
+                  <span id="lblDescontos">-R$ 0,00</span>
+                </div>
+                <div class="summary-row" style="font-size:13px;">
+                  <span style="color:var(--text-muted);">Balança de Embalagem</span>
+                  <span id="lblBagScaleStatus" style="font-weight:700; color:var(--brand-emerald-dark);">Peso Estável (OK)</span>
+                </div>
+                <div style="font-size:11px; color:var(--text-muted); line-height:1.4; background:#f8fafc; padding:8px 10px; border-radius:6px; border:1px solid var(--border-light);">
+                  Selecione um item na tabela para solicitar exclusão autorizada pelo fiscal.
+                </div>
+              </div>
+
+              <div class="total-card-highlight">
+                <span>TOTAL A PAGAR:</span>
+                <span id="lblTotalFinal">R$ 0,00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="t03-bottom-bar">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn btn-outline" style="border-color:var(--brand-amber); color:#b45309; font-weight:800;" onclick="requestAttendantHelp('Dúvida ou solicitação no carrinho de compras')">
+              🔔 Precisa de Ajuda? Chamar Atendente
+            </button>
+            <button class="btn btn-danger" onclick="requestItemRemoval()">Remover Item Selecionado</button>
+            <button class="btn btn-outline" onclick="requestCancelSale()">Cancelar Compra</button>
+          </div>
+          <div style="display:flex; justify-content:flex-end;">
+            <button class="btn btn-emerald" style="width:280px; font-size:16px; height:50px;" onclick="goToPaymentSelection()">
+              Finalizar Compra &rarr;
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s04">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="btn btn-outline" onclick="navigate('s03')">&larr; Voltar ao Carrinho</button>
+            <div style="font-size:18px; font-weight:900; color:var(--brand-navy);">PADARIA &amp; HORTIFRÚTI (PRODUTOS SEM CÓDIGO)</div>
+            <div style="width:120px;"></div>
+          </div>
+
+          <div class="catalog-search">
+            <input type="text" id="pluSearchInput" placeholder="Digite o nome do item ou código PLU (ex: Pão Francês, Banana, Maçã)..." oninput="filterPluCatalog()" />
+          </div>
+
+          <div class="catalog-tabs" id="pluTabs">
+            <button class="catalog-tab active" onclick="setPluCategory('TODOS', this)">TODOS</button>
+            <button class="catalog-tab" onclick="setPluCategory('PADARIA', this)">PADARIA</button>
+            <button class="catalog-tab" onclick="setPluCategory('FRUTAS', this)">FRUTAS</button>
+            <button class="catalog-tab" onclick="setPluCategory('LEGUMES', this)">LEGUMES</button>
+            <button class="catalog-tab" onclick="setPluCategory('ROTISSERIA', this)">ROTISSERIA</button>
+          </div>
+        </div>
+
+        <div class="catalog-grid" id="pluGridContainer">
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+          <button class="btn btn-outline" onclick="navigate('s03')">&larr; Voltar</button>
+          <button class="btn btn-emerald" style="width:260px;" onclick="goToWeighSelected()">Pesar Produto Selecionado &rarr;</button>
+        </div>
+      </section>
+
+      <section class="screen" id="s05">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn btn-outline" onclick="navigate('s04')">&larr; Voltar ao Catálogo</button>
+          <div style="font-size:18px; font-weight:900; color:var(--brand-navy);">PESAGEM DO PRODUTO — BALANÇA TOLEDO PRIX 3 FIT</div>
+          <div style="width:120px;"></div>
+        </div>
+
+        <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+          <div class="scale-card">
+            <div style="font-size:16px; font-weight:900; color:var(--brand-navy);">COLOQUE O PRODUTO SOBRE O PRATO DA BALANÇA</div>
+
+            <div class="scale-plate-visual">
+              <span>PRATO DA BALANÇA (CONFERÊNCIA DINÂMICA)</span>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="adjustWeighSlider(0.150)">+ 150g</button>
+                <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="adjustWeighSlider(0.350)">+ 350g</button>
+                <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="adjustWeighSlider(1.000)">+ 1,000kg</button>
+              </div>
+              <input type="range" id="weighSlider" min="0.050" max="3.000" step="0.025" value="0.350" style="width:240px; cursor:pointer;" oninput="updateWeighReadout()" />
+            </div>
+
+            <div class="scale-digital-display">
+              <span id="lblScaleWeightText">PESO: 0,000 kg</span>
+              <span id="lblScaleTotalText">TOTAL: R$ 0,00</span>
+            </div>
+
+            <div style="text-align:center;">
+              <div id="lblScaleItemName" style="font-size:16px; font-weight:900; color:var(--brand-navy);">Aguardando Produto...</div>
+              <div id="lblScaleItemPrice" style="font-size:13px; color:var(--text-secondary); font-weight:600;">Selecione o produto no catálogo PLU para pesar</div>
+              <div style="font-size:12px; font-weight:700; color:var(--brand-emerald-dark); margin-top:4px;">Célula de Carga Estabilizada (Zero Dinâmico OK)</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn btn-outline" onclick="navigate('s04')">&larr; Cancelar Pesagem</button>
+          <button class="btn btn-emerald" style="width:280px; height:50px; font-size:16px;" onclick="confirmWeighingToCart()">
+            Confirmar e Inserir no Carrinho &rarr;
+          </button>
+        </div>
+      </section>
+
+      <section class="screen" id="s06">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="btn btn-outline" onclick="navigate('s03')" data-i18n="t06_back_btn">&larr; Voltar ao Carrinho</button>
+            <div style="font-size:18px; font-weight:900; color:var(--brand-navy);" data-i18n="t06_title">SELEÇÃO E PROCESSAMENTO DE PAGAMENTO</div>
+            <div style="width:120px;"></div>
+          </div>
+
+          <div style="display:flex; justify-content:center; gap:10px; margin-top:8px;">
+            <button class="catalog-tab active" id="btnPayPix" onclick="setPaymentModality('PIX')" data-i18n="t06_pix">PIX DINÂMICO</button>
+            <button class="catalog-tab" id="btnPayCredit" onclick="setPaymentModality('CREDITO')" data-i18n="t06_credit">CARTÃO DE CRÉDITO</button>
+            <button class="catalog-tab" id="btnPayDebit" onclick="setPaymentModality('DEBITO')" data-i18n="t06_debit">CARTÃO DE DÉBITO</button>
+            <button class="catalog-tab" id="btnPayVoucher" onclick="setPaymentModality('VOUCHER')" data-i18n="t06_voucher">VALE-ALIMENTAÇÃO</button>
+          </div>
+        </div>
+
+        <div class="pay-adaptive-container">
+          
+          <div class="pay-active-panel" id="panelPixArea" style="display: flex;">
+            <div style="font-size:18px; font-weight:900; color:var(--brand-navy);">PIX INSTANTÂNEO (BANCO CENTRAL)</div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-top:4px; max-width:420px;">
+              Abra o app do seu banco ou carteira digital, escolha <strong>Pagar com Pix</strong> e aponte a câmera para o QR Code abaixo:
+            </p>
+
+            <div class="qr-frame">
+              <svg width="150" height="150" viewBox="0 0 100 100">
+                <rect x="5" y="5" width="28" height="28" fill="none" stroke="#0f172a" stroke-width="6"/>
+                <rect x="13" y="13" width="12" height="12" fill="#0f172a"/>
+                <rect x="67" y="5" width="28" height="28" fill="none" stroke="#0f172a" stroke-width="6"/>
+                <rect x="75" y="13" width="12" height="12" fill="#0f172a"/>
+                <rect x="5" y="67" width="28" height="28" fill="none" stroke="#0f172a" stroke-width="6"/>
+                <rect x="13" y="75" width="12" height="12" fill="#0f172a"/>
+                <rect x="44" y="44" width="14" height="14" fill="#10b981"/>
+                <rect x="68" y="68" width="22" height="22" fill="none" stroke="#0f172a" stroke-width="4"/>
+                <rect x="44" y="15" width="10" height="10" fill="#0f172a"/>
+                <rect x="44" y="75" width="10" height="10" fill="#0f172a"/>
+                <rect x="15" y="44" width="10" height="10" fill="#0f172a"/>
+                <rect x="75" y="44" width="10" height="10" fill="#0f172a"/>
+              </svg>
+            </div>
+
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+              <div style="font-size:13px; font-weight:800; color:var(--brand-emerald-dark);" id="pixTimerText">
+                Tempo restante para pagamento: 01:59
+              </div>
+              <button class="btn btn-outline" style="padding:7px 14px; font-size:12px; font-weight:700;" onclick="copyPixCode(this)">
+                📋 Copiar Código Pix Copia e Cola
+              </button>
+              <div style="font-size:11px; color:var(--text-muted); font-weight:600;">
+                Liquidação garantida via SPI Banco Central &bull; Conciliação em 3 segundos
+              </div>
+            </div>
+          </div>
+
+          <div class="pay-active-panel" id="panelCardArea" style="display: none;">
+            <div style="font-size:18px; font-weight:900; color:var(--brand-navy);" id="lblCardTitle">PAGAMENTO COM CARTÃO DE CRÉDITO</div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;" id="lblCardSubtitle">
+              Aproxime por Contactless (NFC) ou insira seu cartão no leitor inferior:
+            </p>
+
+            <div class="pinpad-interactive-terminal">
+              <div class="pinpad-screen" id="pinpadScreenText">
+                <div>APROXIME OU INSIRA</div>
+                <div class="pinpad-pin-dots" id="pinpadPinDots"></div>
+              </div>
+
+              <div style="text-align:center;">
+                <button class="btn btn-outline" style="background:#1e293b; color:#38bdf8; border-color:#38bdf8; font-size:10.5px; padding:4px 8px; font-weight:700; width:100%;" onclick="simulateCardInsert()" id="btnSimulateCardInsert">
+                  💳 Inserir / Aproximar Cartão
+                </button>
+              </div>
+
+              <div class="pinpad-keypad">
+                <button onclick="pressPinpadDigit('1')">1</button>
+                <button onclick="pressPinpadDigit('2')">2</button>
+                <button onclick="pressPinpadDigit('3')">3</button>
+                <button onclick="pressPinpadDigit('4')">4</button>
+                <button onclick="pressPinpadDigit('5')">5</button>
+                <button onclick="pressPinpadDigit('6')">6</button>
+                <button onclick="pressPinpadDigit('7')">7</button>
+                <button onclick="pressPinpadDigit('8')">8</button>
+                <button onclick="pressPinpadDigit('9')">9</button>
+                <button class="key-correct" onclick="backspacePinpad()">CORR</button>
+                <button onclick="pressPinpadDigit('0')">0</button>
+                <button class="key-ok" onclick="submitPinpad()">ENTRA</button>
+              </div>
+            </div>
+
+            <div style="font-size:11px; color:var(--text-muted); font-weight:600; margin-top:6px;">
+              Criptografia DUKPT Triple-DES &bull; Homologado PCI-PTS &amp; SEFAZ
+            </div>
+          </div>
+
+          <div class="pay-summary-panel">
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <div style="font-size:14px; font-weight:900; color:var(--brand-navy); text-transform:uppercase; letter-spacing:0.04em;" data-i18n="t06_summary">
+                Resumo da Operação
+              </div>
+
+              <div style="display:flex; justify-content:space-between; font-size:14px; border-bottom:1px solid var(--border-light); padding-bottom:8px;">
+                <span data-i18n="t06_subtotal">Subtotal</span>
+                <strong id="paySubtotalVal">R$ 0,00</strong>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; font-size:14px; color:var(--brand-emerald-dark); border-bottom:1px solid var(--border-light); padding-bottom:8px;">
+                <span data-i18n="t06_discount">Descontos Clube CPF</span>
+                <strong id="payDiscountVal">-R$ 0,00</strong>
+              </div>
+
+              <div style="background:#f8fafc; border:1px solid var(--border-light); border-radius:8px; padding:10px 12px; font-size:12.5px; text-align:left;">
+                <div style="color:var(--text-muted); font-weight:600;">Modalidade Ativa:</div>
+                <div id="lblActivePayMode" style="color:var(--brand-navy); font-size:15px; font-weight:900; margin-top:2px;">PIX DINÂMICO</div>
+                <div id="lblPayModeStatusText" style="font-size:11px; color:var(--brand-emerald-dark); font-weight:700; margin-top:4px;">
+                  ✓ Aguardando leitura do QR Code
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="total-card-highlight" style="width:100%; padding:14px 18px; font-size:20px; margin-bottom:14px;">
+                <span data-i18n="t06_total">TOTAL:</span>
+                <span id="payTotalVal">R$ 0,00</span>
+              </div>
+
+              <button class="btn btn-emerald" style="width:100%; height:52px; font-size:16px; font-weight:900;" onclick="confirmPaymentSuccess()" id="btnConfirmPayment">
+                <span data-i18n="t06_confirm_btn">Confirmar Pagamento &rarr;</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+          <button class="btn btn-outline" onclick="navigate('s03')" data-i18n="t06_back_btn">&larr; Voltar ao Carrinho</button>
+          <div style="font-size:12px; color:var(--text-muted); font-weight:600;">
+            Transação segura protegida pela infraestrutura GoSelf e Autorizadora SEFAZ
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s07">
+        <div>
+          <div style="font-size:18px; font-weight:900; color:var(--brand-amber-dark); text-align:center;">
+            AVALIAÇÃO DE EXPERIÊNCIA DO CONSUMIDOR
+          </div>
+        </div>
+
+        <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+          <div class="eval-card-gold">
+            <div style="font-size:20px; font-weight:900; color:var(--brand-navy);">
+              Pagamento Aprovado com Sucesso!
+            </div>
+            <p style="font-size:15px; color:var(--text-secondary); font-weight:600;">
+              Como você avalia sua experiência com o totem de autoatendimento GoSelf?
+            </p>
+
+            <div class="star-row" id="starRow">
+              <button class="star-btn active" onclick="setNpsRating(1)"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+              <button class="star-btn active" onclick="setNpsRating(2)"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+              <button class="star-btn active" onclick="setNpsRating(3)"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+              <button class="star-btn active" onclick="setNpsRating(4)"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+              <button class="star-btn active" onclick="setNpsRating(5)"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+            </div>
+
+            <div id="lblRatingText" style="font-size:16px; font-weight:800; color:var(--brand-amber-dark);">
+              5 Estrelas — Atendimento Excelente!
+            </div>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+              <button class="tag-chip selected" onclick="this.classList.toggle('selected')">Rapidez no Checkout</button>
+              <button class="tag-chip selected" onclick="this.classList.toggle('selected')">Facilidade na Balança</button>
+              <button class="tag-chip" onclick="this.classList.toggle('selected')">Interface Clara</button>
+              <button class="tag-chip" onclick="this.classList.toggle('selected')">Pagamento Instantâneo</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn btn-outline" onclick="navigate('s08')">Pular Avaliação</button>
+          <button class="btn btn-emerald" style="width:300px; height:50px; font-size:16px;" onclick="submitRatingAndFinish()">
+            Enviar Avaliação e Imprimir NFC-e &rarr;
+          </button>
+        </div>
+      </section>
+
+      <section class="screen" id="s08">
+        <div>
+          <div style="font-size:18px; font-weight:900; color:var(--brand-emerald-dark); text-align:center;" data-i18n="t08_title">
+            COMPRA CONCLUÍDA — RETIRE SEU COMPROVANTE FISCAL
+          </div>
+        </div>
+
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; margin:10px 0;">
+          <div class="receipt-paper">
+            <div style="text-align:center; border-bottom:1px dashed #64748b; padding-bottom:8px;">
+              <strong style="font-size:14px;">SUPERMERCADO GOSELF LTDA</strong><br/>
+              CNPJ: 12.345.678/0001-90 &bull; IE: 258.987.410<br/>
+              DANFE NFC-e — Documento Auxiliar da Nota Fiscal de Consumidor
+            </div>
+
+            <div style="line-height:1.4;">
+              CONSUMIDOR: <strong id="recCpf">---</strong><br/>
+              MODALIDADE: <strong id="recPaymentMode">PIX DINÂMICO</strong><br/>
+              TERMINAL: TOTEM-03 &bull; SÉRIE: 001
+            </div>
+
+            <div id="recItemsList" style="border-top:1px dashed #64748b; border-bottom:1px dashed #64748b; padding:8px 0; max-height:130px; overflow-y:auto;">
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:800; color:var(--brand-navy);">
+              <span>TOTAL PAGO:</span>
+              <span id="recTotalVal">R$ 0,00</span>
+            </div>
+
+            <div style="font-size:10.5px; color:var(--text-muted); text-align:center; line-height:1.4;">
+              Chave de Acesso SEFAZ:<br/>
+              <span id="recChaveAcesso" style="font-family:'JetBrains Mono',monospace; font-weight:700;">3526 1012 3456 7800 0190 6500 1000 0184 7219 2837 4651</span><br/>
+              Protocolo de Autorização: 352610180001928374<br/>
+              Impressora Térmica Bematech MP-4200 TH &bull; Corte de Papel OK
+            </div>
+          </div>
+
+          <div style="background:#ffffff; border:1.5px solid var(--border-default); border-radius:12px; padding:14px 20px; max-width:440px; width:100%; box-shadow:var(--shadow-sm); text-align:center;">
+            <div style="font-size:13px; font-weight:800; color:var(--brand-navy); margin-bottom:4px; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span>📧</span> <span data-i18n="rec_email_title">Receber Cupom Fiscal por E-mail (Opcional)</span>
+            </div>
+            <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:10px;" data-i18n="rec_email_desc">
+              Economize papel e receba seu comprovante DANFE NFC-e e o arquivo XML direto na sua caixa de entrada.
+            </p>
+            <div style="display:flex; gap:8px;">
+              <input type="email" id="receiptEmailInput" placeholder="seu-email@dominio.com" class="form-control" style="flex:1; padding:9px 12px; font-size:13px; border:1.5px solid var(--border-default); border-radius:8px; outline:none;" onkeydown="if(event.key==='Enter'){event.preventDefault();sendReceiptByEmail();}" />
+              <button class="btn btn-emerald" style="padding:9px 16px; font-size:13px; font-weight:800; white-space:nowrap;" onclick="sendReceiptByEmail()" id="btnSendEmailReceipt" data-i18n="rec_email_btn">
+                Enviar E-mail
+              </button>
+            </div>
+            <div id="emailReceiptStatus" style="font-size:12px; font-weight:700; margin-top:8px; display:none;"></div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:center;">
+          <button class="btn btn-primary" style="width:360px; height:54px; font-size:16px;" onclick="resetKioskSession()" data-i18n="t08_finish">
+            Concluir e Iniciar Próximo Cliente
+          </button>
+        </div>
+      </section>
+
+      <section class="screen" id="s09">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:36px; height:36px; border-radius:50%; background:var(--brand-navy); color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:800;">OP</div>
+              <div>
+                <div style="font-size:14px; font-weight:800;">João A. Bernardo (Matrícula: 2026-MOSI)</div>
+                <div style="font-size:11px; color:var(--text-muted);">Perfil: Administrador / Técnico / Fiscal</div>
+              </div>
+            </div>
+            <div style="font-size:16px; font-weight:900; color:var(--brand-navy);" id="adminTitle">PAINEL DO TÉCNICO DE SUPORTE</div>
+            <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="navigate('s01')">&larr; Sair ao Totem</button>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <button class="catalog-tab active" id="tabTech" onclick="switchBackofficeTab('TECH')">Técnico de Suporte (Periféricos &amp; Terminal)</button>
+            <button class="catalog-tab" id="tabStock" onclick="switchBackofficeTab('STOCK')">Responsável pelo Estoque (Catálogo CRUD)</button>
+            <button class="catalog-tab" id="tabAdmin" onclick="switchBackofficeTab('ADMIN')">Administrador (Métricas &amp; Trilha de Auditoria)</button>
+          </div>
+
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px 14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:12px; color:#1e40af; font-weight:600;">
+              <strong>Ambiente de Retaguarda Desacoplado:</strong> O sistema corporativo conta com o Portal Web Independente (admin.html) com login por senha e controle de acesso baseado em papéis (RBAC).
+            </div>
+            <a href="admin.html" target="_blank" class="btn btn-primary" style="padding:6px 14px; font-size:12px; text-decoration:none; white-space:nowrap;">
+              Abrir Portal Dedicado (admin.html) &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div id="viewTech" style="display:grid; grid-template-columns:1fr 1fr; gap:14px; flex:1;">
+          <div style="background:#ffffff; border:1px solid var(--border-default); border-radius:12px; padding:16px; font-size:13px; display:flex; flex-direction:column; gap:6px;">
+            <h3 style="font-size:14px; font-weight:800; color:var(--brand-navy); border-bottom:1px solid var(--border-light); padding-bottom:4px;">Parâmetros de Rede &amp; Servidor</h3>
+            <div>IP Servidor Local: <strong>192.168.1.50:8080</strong></div>
+            <div>ID do Totem: <strong>TOTEM-03 (Checkout Rápido)</strong></div>
+            <div>Ambiente: <strong>[ Produção ]</strong> (Homologação | Treino)</div>
+            <div style="color:var(--brand-emerald-dark); font-weight:700;">Nuvem Sincronizada (Ping: 12ms) &bull; WebSocket Ativo</div>
+          </div>
+
+          <div style="background:#ffffff; border:1px solid var(--border-default); border-radius:12px; padding:16px; font-size:13px; display:flex; flex-direction:column; gap:6px;">
+            <h3 style="font-size:14px; font-weight:800; color:var(--brand-navy); border-bottom:1px solid var(--border-light); padding-bottom:4px;">Balança Integrada &amp; Telemetria</h3>
+            <div>Porta Serial: <strong>COM3 (RS-232 / USB)</strong></div>
+            <div>Protocolo: <strong>Toledo / Filizola P03</strong></div>
+            <div>Tolerância Anti-Perda: <strong>&plusmn; 15g (MOSI)</strong></div>
+            <div style="color:var(--brand-emerald-dark); font-weight:700;">Status: Calibrada &bull; Zero Estável (0.000 kg)</div>
+          </div>
+
+          <div style="background:#ffffff; border:1px solid var(--border-default); border-radius:12px; padding:16px; font-size:13px; display:flex; flex-direction:column; gap:6px;">
+            <h3 style="font-size:14px; font-weight:800; color:var(--brand-navy); border-bottom:1px solid var(--border-light); padding-bottom:4px;">Pinpad TEF &amp; Pagamento</h3>
+            <div>Módulo TEF: <strong>Client Stone / SiTef Ativo</strong></div>
+            <div>NFC Contactless: <strong>13.56 MHz Habilitado</strong></div>
+            <div>Criptografia: <strong>DUKPT Triple-DES Ativa</strong></div>
+            <div style="color:var(--brand-emerald-dark); font-weight:700;">Comunicação USB Pinpad OK</div>
+          </div>
+
+          <div style="background:#ffffff; border:1px solid var(--border-default); border-radius:12px; padding:16px; font-size:13px; display:flex; flex-direction:column; gap:6px;">
+            <h3 style="font-size:14px; font-weight:800; color:var(--brand-navy); border-bottom:1px solid var(--border-light); padding-bottom:4px;">Impressora Térmica &amp; SEFAZ</h3>
+            <div>Modelo: <strong>Bematech MP-4200 TH</strong></div>
+            <div>Velocidade: <strong>250 mm/s | Guilhotina: Ativa</strong></div>
+            <div>Certificado Digital A1: <strong>Válido até 12/2027</strong></div>
+            <div style="color:var(--brand-emerald-dark); font-weight:700;">Rolo de Papel: 85% &bull; Comunicação SEFAZ OK</div>
+          </div>
+        </div>
+
+        <div id="viewStock" style="display:none; flex:1; flex-direction:column; gap:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:800; font-size:14px;">Controle de Estoque &amp; Catálogo</span>
+            <button class="btn btn-emerald" style="padding:6px 14px; font-size:12px;" onclick="addNewStockProductModal()">+ Cadastrar Produto</button>
+          </div>
+          <div style="flex:1; background:#ffffff; border:1px solid var(--border-default); border-radius:12px; overflow-y:auto; padding:12px;">
+            <table class="cart-table" id="stockCrudTable">
+              <thead>
+                <tr>
+                  <th>Cód. EAN/PLU</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Preço Unit.</th>
+                  <th>Saldo Estoque</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="stockCrudRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="viewAdmin" style="display:none; flex:1; flex-direction:column; gap:12px;">
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px;">
+            <div style="background:#ffffff; border:1px solid var(--border-default); border-radius:10px; padding:14px;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-muted);">FATURAMENTO HOJE</div>
+              <div style="font-size:20px; font-weight:900; color:var(--brand-navy); margin-top:4px;" id="s09Faturamento">R$ 0,00</div>
+            </div>
+            <div style="background:#ffffff; border:1px solid var(--border-default); border-radius:10px; padding:14px;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-muted);">TOTAL DE VENDAS</div>
+              <div style="font-size:20px; font-weight:900; color:var(--brand-navy); margin-top:4px;" id="s09Vendas">0 Cupons</div>
+            </div>
+            <div style="background:#ffffff; border:1px solid var(--border-default); border-radius:10px; padding:14px;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-muted);">TICKET MÉDIO</div>
+              <div style="font-size:20px; font-weight:900; color:var(--brand-navy); margin-top:4px;" id="s09TicketMedio">R$ 0,00</div>
+            </div>
+            <div style="background:#ffffff; border:1px solid var(--border-default); border-radius:10px; padding:14px;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-muted);">SATISFAÇÃO CSAT</div>
+              <div style="font-size:20px; font-weight:900; color:var(--brand-emerald-dark); margin-top:4px;" id="s09Csat">Sem Avaliações</div>
+            </div>
+          </div>
+
+          <div style="flex:1; background:#ffffff; border:1px solid var(--border-default); border-radius:12px; padding:14px; overflow-y:auto;">
+            <div style="font-size:13px; font-weight:800; color:var(--brand-navy); margin-bottom:8px;">Trilha de Auditoria Forense (Eventos Operacionais)</div>
+            <table class="cart-table">
+              <thead>
+                <tr>
+                  <th>Data/Hora</th>
+                  <th>Operador</th>
+                  <th>Terminal</th>
+                  <th>Tipo de Ocorrência</th>
+                  <th>Justificativa</th>
+                </tr>
+              </thead>
+              <tbody id="auditRows">
+                <tr>
+                  <td colspan="5" style="text-align:center; padding:18px; color:var(--text-muted);">Nenhuma intervenção registrada na sessão atual. Tudo operando 100% automático.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+          <button class="btn btn-outline" onclick="navigate('s01')">&larr; Voltar ao Início</button>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-emerald" onclick="showToast('Configurações do Totem salvas com sucesso!')">Salvar Parâmetros</button>
+            <button class="btn btn-primary" onclick="testAllPeripherals()">Executar Auto-Teste de Hardware</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="modal-overlay" id="modalDivergence">
+      <div class="modal-dialog" style="border-color:#fca5a5;">
+        <div style="font-size:42px;">⚖️</div>
+        <div style="font-size:20px; font-weight:900; color:var(--brand-danger-dark);">DIVERGÊNCIA DE PESO DETECTADA</div>
+        <p style="font-size:14px; color:var(--text-secondary); line-height:1.4;">
+          O peso detectado pela balança de conferência não coincide com o peso cadastrado do produto escaneado (&plusmn;15g).
+        </p>
+
+        <div style="background:#fee2e2; border:1px solid #fca5a5; padding:10px; border-radius:8px; font-size:12px; font-weight:700; color:#991b1b; text-align:left;">
+          Torre Andon acionada: luz âmbar piscando no totem.<br/>
+          Por favor, aguarde o atendente de loja para liberação com crachá ou PIN.
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button class="btn btn-primary" onclick="openSupervisorPinModal('LIBERAR_DIVERGENCIA')">
+            Identificar Fiscal de Loja (PIN)
+          </button>
+          <button class="btn btn-outline" onclick="closeDivergenceModal()">
+            Tentar Bipar Novamente
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalAlcohol">
+      <div class="modal-dialog" style="border-color:#fcd34d;">
+        <div style="font-size:42px;">🔞</div>
+        <div style="font-size:20px; font-weight:900; color:var(--brand-navy);">PRODUTO COM RESTRIÇÃO DE IDADE (18+)</div>
+        <p style="font-size:14px; color:var(--text-secondary); line-height:1.4;">
+          Venda proibida para menores de 18 anos conforme o Art. 243 da Lei 8.069/90 (ECA).
+        </p>
+        <div style="background:#fef3c7; border:1px solid #fcd34d; padding:10px; border-radius:8px; font-size:12px; font-weight:700; color:#b45309; text-align:left;">
+          Apresente seu documento de identidade com foto ao fiscal de loja para desbloqueio da sessão.
+        </div>
+        <button class="btn btn-primary" onclick="openSupervisorPinModal('LIBERAR_18_ANOS')">
+          Fiscal: Autorizar Documento de Identidade
+        </button>
+        <button class="btn btn-outline" onclick="cancelAlcoholItem()">
+          Remover Bebida do Carrinho
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalCustomerHelp">
+      <div class="modal-dialog" style="text-align:center; max-width:460px;">
+        <div style="width:68px; height:68px; border-radius:50%; background:#fef3c7; color:#d97706; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">
+          🔔
+        </div>
+        <div style="font-size:22px; font-weight:900; color:var(--brand-navy); margin-bottom:6px;">
+          Atendente Solicitado
+        </div>
+        <div style="font-size:13px; color:var(--text-muted); font-weight:700; margin-bottom:14px;" id="helpReasonDisplay">
+          Solicitação de auxílio no terminal
+        </div>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px; font-size:13px; line-height:1.5; color:#334155; margin-bottom:20px; text-align:left;">
+          <strong>O Fiscal de Loja já foi notificado e está a caminho do Totem #03.</strong><br>
+          A Torre Andon no topo do terminal foi ativada em luz amarela para identificação visual rápida.<br>
+          <span style="color:var(--text-muted); font-size:12px; margin-top:4px; display:inline-block;">
+            Por favor, permaneça no terminal com seus produtos. O atendente irá até você para esclarecer dúvidas ou prestar assistência.
+          </span>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" style="flex:1;" onclick="cancelCustomerHelp()">
+            Cancelar Chamado
+          </button>
+          <button class="btn btn-primary" style="flex:1;" onclick="dismissCustomerHelpAlert()">
+            Aguardar Atendente
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalSupervisor">
+      <div class="modal-dialog">
+        <div style="font-size:18px; font-weight:900; color:var(--brand-navy);">AUTORIZAÇÃO DO SUPERVISOR / FISCAL</div>
+        <div style="font-size:12px; color:var(--text-muted); font-weight:700;" id="supReasonLabel">
+          Motivo: Liberação Operacional do Fiscal de Loja
+        </div>
+
+        <div style="width:100%; height:46px; background:#f8fafc; border:2px solid var(--brand-navy); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:22px; letter-spacing:6px; font-weight:800;" id="supPinDisplay">
+          _ _ _ _
+        </div>
+
+        <div class="t02-keypad" style="gap:6px;">
+          <button class="key-btn" style="height:42px;" onclick="pressSupDigit('1')">1</button>
+          <button class="key-btn" style="height:42px;" onclick="pressSupDigit('2')">2</button>
+          <button class="key-btn" style="height:42px;" onclick="pressSupDigit('3')">3</button>
+          <button class="key-btn" style="height:42px;" onclick="pressSupDigit('4')">4</button>
+          <button class="key-btn" style="height:42px;" onclick="pressSupDigit('5')">5</button>
+          <button class="key-btn" style="height:42px;" onclick="pressSupDigit('6')">6</button>
+          <button class="key-btn" style="height:42px;" onclick="pressSupDigit('7')">7</button>
+          <button class="key-btn" style="height:42px;" onclick="pressSupDigit('8')">8</button>
+          <button class="key-btn" style="height:42px;" onclick="pressSupDigit('9')">9</button>
+          <button class="key-btn" style="height:42px; font-size:12px; color:var(--brand-danger);" onclick="clearSupPin()">C</button>
+          <button class="key-btn" style="height:42px;" onclick="pressSupDigit('0')">0</button>
+          <button class="key-btn" style="height:42px; font-size:12px;" onclick="backspaceSupPin()">⌫</button>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" style="flex:1;" onclick="closeSupervisorModal()">Cancelar</button>
+          <button class="btn btn-primary" style="flex:1;" onclick="confirmSupervisorPin()">Confirmar PIN</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalEmailSent">
+      <div class="modal-dialog" style="max-width:540px; text-align:left;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid var(--border-default); padding-bottom:12px; margin-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:22px;">✉️</span>
+            <div>
+              <div style="font-size:16px; font-weight:900; color:var(--brand-navy);">Comprovante Fiscal Digital Enviado</div>
+              <div style="font-size:11px; color:var(--text-muted); font-weight:700;">Mensageria SEFAZ &bull; GoSelf Supermercados</div>
+            </div>
+          </div>
+          <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="closeEmailSentModal()">&times; Fechar</button>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid var(--border-default); border-radius:10px; padding:12px 14px; font-size:12.5px; line-height:1.6; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:var(--text-muted); font-weight:700;">Remetente:</span>
+            <strong style="color:var(--brand-navy);">nfe-automatico@goself.com.br</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:var(--text-muted); font-weight:700;">Destinatário:</span>
+            <strong style="color:var(--brand-emerald-dark);" id="modalEmailRecipient">cliente@email.com</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:var(--text-muted); font-weight:700;">Assunto:</span>
+            <strong id="modalEmailSubject">[NFC-e] GoSelf - Cupom Fiscal Eletrônico</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:var(--text-muted); font-weight:700;">Data e Hora:</span>
+            <span id="modalEmailTimestamp" style="font-weight:700;">--/--/---- --:--</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-muted); font-weight:700;">Chave SEFAZ:</span>
+            <span id="modalEmailKey" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:800; color:var(--brand-navy);">3526 1012 3456 7800 0190...</span>
+          </div>
+        </div>
+
+        <div style="background:#ffffff; border:1px dashed var(--border-default); border-radius:10px; padding:10px 14px; font-size:12px; margin-bottom:14px;">
+          <div style="font-weight:800; color:var(--brand-navy); margin-bottom:6px;">Arquivos Digitais Anexados no Disparo:</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span style="background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+              📄 DANFE_NFCe.pdf
+            </span>
+            <span style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+              🔐 NFCe_XML_Assinado_SEFAZ.xml
+            </span>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-primary" style="flex:1; padding:9px 12px; font-size:12.5px; font-weight:800;" onclick="openNativeMailClient()">
+            📬 Abrir no Cliente de E-mail (mailto)
+          </button>
+          <button class="btn btn-emerald" style="flex:1; padding:9px 12px; font-size:12.5px; font-weight:800;" onclick="closeEmailSentModal()">
+            ✓ Entendido / Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="kiosk-toast" id="kioskToast">Notificação do Totem</div>
+  </main>
+
+  <script src="goself-sync.js"></script>
+
+  <script>
+    let audioEnabled = true;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx && AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('btnAudioToggle').textContent = audioEnabled ? '🔊 Som: ON' : '🔇 Som: OFF';
+      showToast(audioEnabled ? 'Efeitos sonoros ativados!' : 'Efeitos sonoros silenciados.');
+    }
+
+    function playBeep(freq = 1250, duration = 0.08, type = 'sine') {
+      if (!audioEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playSoundSuccess() {
+      playBeep(880, 0.08);
+      setTimeout(() => playBeep(1320, 0.12), 90);
+    }
+
+    function playSoundError() {
+      playBeep(320, 0.16, 'sawtooth');
+      setTimeout(() => playBeep(260, 0.22, 'sawtooth'), 120);
+    }
+
+    function playKeyClick() {
+      playBeep(900, 0.02, 'triangle');
+    }
+
+    const productsDB = {
+      '22986': { code: '22986', name: 'Pão Francês Tradicional', category: 'PADARIA', unit: 'kg', price: 17.99, weightNominal: 0.050, pesavel: true, isAlcohol: false, stock: 150 },
+      '22563': { code: '22563', name: 'Patinho Bovino Moído', category: 'AÇOUGUE', unit: 'kg', price: 29.89, weightNominal: 0.500, pesavel: true, isAlcohol: false, stock: 80 },
+      '23658': { code: '23658', name: 'Banana Prata Selecionada', category: 'HORTIFRÚTI', unit: 'kg', price: 5.49, weightNominal: 0.120, pesavel: true, isAlcohol: false, stock: 200 },
+      '21563': { code: '21563', name: 'Repolho Verde Fresco', category: 'HORTIFRÚTI', unit: 'uni', price: 2.99, weightNominal: 0.850, pesavel: false, isAlcohol: false, stock: 65 },
+      '78533': { code: '78533', name: 'Detergente Neutro Limpol 500ml', category: 'LIMPEZA', unit: 'uni', price: 1.99, weightNominal: 0.520, pesavel: false, isAlcohol: false, stock: 320 },
+      '78911': { code: '78911', name: 'Cerveja Artesanal IPA 500ml', category: 'BEBIDAS', unit: 'uni', price: 14.90, weightNominal: 0.530, pesavel: false, isAlcohol: true, stock: 95 }
+    };
+
+    const pluCatalog = [
+      { code: 'PLU-101', name: 'Pão Francês Tradicional', price: 18.90, unit: 'kg', category: 'PADARIA' },
+      { code: 'PLU-102', name: 'Pão de Queijo Mineiro', price: 34.90, unit: 'kg', category: 'PADARIA' },
+      { code: 'PLU-103', name: 'Croissant Recheado', price: 8.50, unit: 'uni', category: 'PADARIA' },
+      { code: 'PLU-201', name: 'Banana Prata', price: 6.99, unit: 'kg', category: 'FRUTAS' },
+      { code: 'PLU-202', name: 'Maçã Gala Especial', price: 11.90, unit: 'kg', category: 'FRUTAS' },
+      { code: 'PLU-203', name: 'Laranja Pera Doce', price: 4.99, unit: 'kg', category: 'FRUTAS' },
+      { code: 'PLU-301', name: 'Tomate Longa Vida', price: 7.99, unit: 'kg', category: 'LEGUMES' },
+      { code: 'PLU-302', name: 'Cenoura Higienizada', price: 4.89, unit: 'kg', category: 'LEGUMES' },
+      { code: 'PLU-401', name: 'Frango Assado Especial', price: 39.90, unit: 'uni', category: 'ROTISSERIA' }
+    ];
+
+    let session = {
+      cpf: '',
+      customerName: 'Consumidor',
+      isIdentified: false,
+      bagWeightTarada: 0,
+      activeStep: 's01',
+      paymentModality: 'PIX DINÂMICO',
+      pixCountdown: 119,
+      currentLang: 'PT'
+    };
+    let pinpadPinBuffer = '';
+    let pinpadCardInserted = false;
+
+    function togglePresenterConsole() {
+      const consoleEl = document.getElementById('presenterConsole');
+      const icon = document.getElementById('presenterToggleIcon');
+      if (!consoleEl) return;
+      const isHidden = (consoleEl.style.display === 'none' || !consoleEl.style.display);
+      consoleEl.style.display = isHidden ? 'flex' : 'none';
+      if (icon) icon.textContent = isHidden ? '▲' : '▼';
+    }
+
+    const I18N = {
+      PT: {
+        step_start: 'Início',
+        step_cpf: 'CPF Obrigatório',
+        step_cart: 'Carrinho',
+        step_pay: 'Pagamento',
+        step_eval: 'Avaliação',
+        step_receipt: 'Comprovante',
+        t01_welcome_full: 'Bem-vindo ao checkout inteligente.<br/>Para iniciar suas compras, identifique-se com seu CPF.',
+        t01_btn_start: 'INICIAR COMPRA',
+        t01_btn_tagline: 'Identifique-se com seu CPF para liberar o leitor',
+        t01_lang: 'Idioma:',
+        t01_help: 'Precisa de ajuda? Chamar Atendente',
+        t01_legal: 'Conforme Lei Federal 12.741/12 • SEFAZ NFC-e Conectada',
+        t06_title: 'SELEÇÃO E PROCESSAMENTO DE PAGAMENTO',
+        t06_pix: 'PIX DINÂMICO',
+        t06_credit: 'CARTÃO DE CRÉDITO',
+        t06_debit: 'CARTÃO DE DÉBITO',
+        t06_voucher: 'VALE-ALIMENTAÇÃO',
+        t06_summary: 'Resumo da Operação',
+        t06_subtotal: 'Subtotal',
+        t06_discount: 'Descontos Clube CPF',
+        t06_total: 'TOTAL:',
+        t06_confirm_btn: 'Confirmar Pagamento →',
+        t06_back_btn: '← Voltar ao Carrinho',
+        t08_title: 'COMPRA CONCLUÍDA — RETIRE SEU COMPROVANTE FISCAL',
+        t08_finish: 'Concluir e Iniciar Próximo Cliente',
+        rec_email_title: 'Receber Cupom Fiscal por E-mail (Opcional)',
+        rec_email_desc: 'Economize papel e receba seu comprovante DANFE NFC-e e o arquivo XML direto na sua caixa de entrada.',
+        rec_email_btn: 'Enviar E-mail'
+      },
+      EN: {
+        step_start: 'Start',
+        step_cpf: 'Mandatory ID',
+        step_cart: 'Cart',
+        step_pay: 'Payment',
+        step_eval: 'Feedback',
+        step_receipt: 'Receipt',
+        t01_welcome_full: 'Welcome to smart checkout.<br/>To begin your shopping session, identify yourself with your ID.',
+        t01_btn_start: 'START SHOPPING',
+        t01_btn_tagline: 'Please enter your ID to unlock the barcode scanner',
+        t01_lang: 'Language:',
+        t01_help: 'Need assistance? Call Attendant',
+        t01_legal: 'In compliance with Retail Regulations • Fiscal Receipt Connected',
+        t06_title: 'PAYMENT SELECTION & PROCESSING',
+        t06_pix: 'INSTANT PIX QR',
+        t06_credit: 'CREDIT CARD',
+        t06_debit: 'DEBIT CARD',
+        t06_voucher: 'MEAL VOUCHER',
+        t06_summary: 'Transaction Summary',
+        t06_subtotal: 'Subtotal',
+        t06_discount: 'Member Discounts',
+        t06_total: 'TOTAL:',
+        t06_confirm_btn: 'Confirm Payment →',
+        t06_back_btn: '← Back to Cart',
+        t08_title: 'PURCHASE COMPLETED — PLEASE TAKE YOUR FISCAL RECEIPT',
+        t08_finish: 'Finish & Start Next Customer',
+        rec_email_title: 'Receive Digital Receipt by E-mail (Optional)',
+        rec_email_desc: 'Save paper and receive your itemized receipt and fiscal XML directly in your inbox.',
+        rec_email_btn: 'Send E-mail'
+      },
+      ES: {
+        step_start: 'Inicio',
+        step_cpf: 'ID Obligatorio',
+        step_cart: 'Carrito',
+        step_pay: 'Pago',
+        step_eval: 'Valoración',
+        step_receipt: 'Comprobante',
+        t01_welcome_full: 'Bienvenido al autoservicio inteligente.<br/>Para iniciar sus compras, identifíquese con su documento.',
+        t01_btn_start: 'INICIAR COMPRA',
+        t01_btn_tagline: 'Identifíquese con su documento para desbloquear el lector',
+        t01_lang: 'Idioma:',
+        t01_help: '¿Necesita ayuda? Llamar Asistente',
+        t01_legal: 'Conforme a la Ley Fiscal • Sistema de Recibos Conectado',
+        t06_title: 'SELECCIÓN Y PROCESAMIENTO DE PAGO',
+        t06_pix: 'PIX INSTANTÁNEO',
+        t06_credit: 'TARJETA DE CRÉDITO',
+        t06_debit: 'TARJETA DE DÉBITO',
+        t06_voucher: 'VALE DE ALIMENTOS',
+        t06_summary: 'Resumen de la Operación',
+        t06_subtotal: 'Subtotal',
+        t06_discount: 'Descuentos Club Cliente',
+        t06_total: 'TOTAL:',
+        t06_confirm_btn: 'Confirmar Pago →',
+        t06_back_btn: '← Volver al Carrito',
+        t08_title: 'COMPRA FINALIZADA — RETIRE SU COMPROBANTE FISCAL',
+        t08_finish: 'Finalizar e Iniciar Siguiente Cliente',
+        rec_email_title: 'Recibir Comprobante por Correo (Opcional)',
+        rec_email_desc: 'Ahorre papel y guarde su comprobante fiscal y archivo XML en su bandeja de entrada.',
+        rec_email_btn: 'Enviar Correo'
+      }
+    };
+
+    function changeLanguage(lang) {
+      if (!I18N[lang]) lang = 'PT';
+      session.currentLang = lang;
+      try { localStorage.setItem('goself_selected_lang', lang); } catch (e) {}
+
+      const dict = I18N[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      const welcomeEl = document.getElementById('t01WelcomeDesc');
+      if (welcomeEl && dict.t01_welcome_full) {
+        welcomeEl.innerHTML = dict.t01_welcome_full;
+      }
+
+      const langSelect = document.getElementById('langSelect');
+      if (langSelect && langSelect.value !== lang) {
+        langSelect.value = lang;
+      }
+
+      const toastMsgs = {
+        'PT': 'Idioma alterado para Português!',
+        'EN': 'Language changed to English!',
+        'ES': '¡Idioma cambiado a Español!'
+      };
+      showToast(toastMsgs[lang] || toastMsgs['PT']);
+      playKeyClick();
+    }
+
+    let cart = [];
+    let selectedCartIndex = -1;
+    let supervisorAction = 'LIBERAR';
+    let supervisorPinBuffer = '';
+    let selectedPluItem = pluCatalog[0];
+    let selectedPluCategory = 'TODOS';
+    let pixTimerInterval = null;
+
+    function formatBRL(val) {
+      return 'R$ ' + val.toFixed(2).replace('.', ',');
+    }
+
+    function showToast(text, isDanger = false) {
+      const t = document.getElementById('kioskToast');
+      t.textContent = text;
+      t.style.borderLeftColor = isDanger ? 'var(--brand-danger)' : 'var(--brand-emerald)';
+      t.style.display = 'block';
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => { t.style.display = 'none'; }, 3400);
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      const str = now.toLocaleTimeString('pt-BR');
+      document.getElementById('clockLive').textContent = str;
+    }, 1000);
+
+    function navigate(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) target.classList.add('active');
+
+      session.activeStep = screenId;
+
+      document.querySelectorAll('#quickNav button').forEach(b => b.classList.remove('active'));
+      const activeNav = Array.from(document.querySelectorAll('#quickNav button')).find(b => b.getAttribute('onclick')?.includes(screenId));
+      if (activeNav) activeNav.classList.add('active');
+
+      updateStepBadges(screenId);
+
+      if (screenId === 's03') renderCartTable();
+      if (screenId === 's04') renderPluCatalog();
+      if (screenId === 's05') updateWeighReadout();
+      if (screenId === 's06') setupPaymentScreen();
+      if (screenId === 's08') renderFiscalReceipt();
+      if (screenId === 's09') renderStockCrud();
+
+      playKeyClick();
+    }
+
+    function updateStepBadges(screenId) {
+      const stepMap = {
+        's01': 1,
+        's02': 2,
+        's03': 3,
+        's04': 3,
+        's05': 3,
+        's06': 4,
+        's07': 5,
+        's08': 6
+      };
+      const cur = stepMap[screenId] || 1;
+      for (let i = 1; i <= 6; i++) {
+        const badge = document.getElementById('st-' + i);
+        if (!badge) continue;
+        badge.classList.remove('active', 'done');
+        if (i === cur) badge.classList.add('active');
+        else if (i < cur) badge.classList.add('done');
+      }
+    }
+
+    let cpfInputDigits = '';
+
+    function isValidCpf(strCPF) {
+      strCPF = strCPF.replace(/[^\d]+/g, '');
+      if (strCPF.length !== 11 || /^(\d)\1{10}$/.test(strCPF)) return false;
+      let soma = 0, resto;
+      for (let i = 1; i <= 9; i++) soma += parseInt(strCPF.substring(i - 1, i)) * (11 - i);
+      resto = (soma * 10) % 11;
+      if (resto === 10 || resto === 11) resto = 0;
+      if (resto !== parseInt(strCPF.substring(9, 10))) return false;
+      soma = 0;
+      for (let i = 1; i <= 10; i++) soma += parseInt(strCPF.substring(i - 1, i)) * (12 - i);
+      resto = (soma * 10) % 11;
+      if (resto === 10 || resto === 11) resto = 0;
+      if (resto !== parseInt(strCPF.substring(10, 11))) return false;
+      return true;
+    }
+
+    function formatCpfVisual(digits) {
+      const pad = digits.padEnd(11, '_');
+      return `${pad.slice(0,3)} . ${pad.slice(3,6)} . ${pad.slice(6,9)} - ${pad.slice(9,11)}`;
+    }
+
+    function updateCpfDisplay() {
+      const disp = document.getElementById('cpfDisplay');
+      disp.textContent = formatCpfVisual(cpfInputDigits);
+
+      const err = document.getElementById('cpfErrorMsg');
+      const btn = document.getElementById('btnSubmitCpf');
+
+      if (cpfInputDigits.length === 11) {
+        if (isValidCpf(cpfInputDigits)) {
+          disp.classList.remove('invalid');
+          err.style.display = 'none';
+          btn.disabled = false;
+        } else {
+          disp.classList.add('invalid');
+          err.style.display = 'block';
+          btn.disabled = true;
+          playSoundError();
+        }
+      } else {
+        disp.classList.remove('invalid');
+        err.style.display = 'none';
+        btn.disabled = true;
+      }
+    }
+
+    function pressCpfDigit(d) {
+      if (cpfInputDigits.length < 11) {
+        cpfInputDigits += d;
+        playKeyClick();
+        updateCpfDisplay();
+      }
+    }
+
+    function backspaceCpfDigit() {
+      cpfInputDigits = cpfInputDigits.slice(0, -1);
+      playKeyClick();
+      updateCpfDisplay();
+    }
+
+    function clearCpfInput() {
+      cpfInputDigits = '';
+      playKeyClick();
+      updateCpfDisplay();
+    }
+
+    function fillTestCpf(cpf, name) {
+      cpfInputDigits = cpf;
+      session.customerName = name;
+      updateCpfDisplay();
+      playSoundSuccess();
+      showToast(`CPF preenchido: ${name}`);
+    }
+
+    function toggleCustomerBag() {
+      const btn = document.getElementById('btnTaraPropria');
+      if (session.bagWeightTarada === 0) {
+        session.bagWeightTarada = 0.085;
+        btn.textContent = '✓ Sacola Tarada na Balança (85g)';
+        btn.style.borderColor = 'var(--brand-emerald)';
+        btn.style.color = 'var(--brand-emerald-dark)';
+        playSoundSuccess();
+        showToast('Tara mecânica da sacola do cliente (85g) aplicada na Toledo Prix!');
+      } else {
+        session.bagWeightTarada = 0;
+        btn.textContent = 'Tarar Sacola na Balança (0g)';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+        showToast('Tara de sacola removida da balança.');
+      }
+    }
+
+    function validateAndOpenCart() {
+      if (!isValidCpf(cpfInputDigits)) {
+        playSoundError();
+        showToast('CPF Inválido! Insira 11 dígitos válidos da Receita Federal.', true);
+        return;
+      }
+      session.cpf = cpfInputDigits;
+      session.isIdentified = true;
+
+      const formatted = `${cpfInputDigits.slice(0,3)}.${cpfInputDigits.slice(3,6)}.${cpfInputDigits.slice(6,9)}-${cpfInputDigits.slice(9,11)}`;
+      document.getElementById('activeCpfHeader').textContent = 'CPF: ' + formatted;
+      document.getElementById('activeCpfHeader').style.display = 'inline-block';
+      document.getElementById('customerBadge').textContent = 'CPF VINCULADO: ' + formatted;
+      document.getElementById('customerNameBadge').textContent = session.customerName;
+
+      playSoundSuccess();
+      showToast('CPF validado com sucesso! Leitor óptico e balança desbloqueados.');
+      navigate('s03');
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) {
+        return;
+      }
+      if (session.activeStep === 's02') {
+        if (e.key >= '0' && e.key <= '9') pressCpfDigit(e.key);
+        else if (e.key === 'Backspace') backspaceCpfDigit();
+        else if (e.key === 'Enter' && cpfInputDigits.length === 11 && isValidCpf(cpfInputDigits)) validateAndOpenCart();
+      } else if (session.activeStep === 's06') {
+        if (e.key >= '0' && e.key <= '9') pressPinpadDigit(e.key);
+        else if (e.key === 'Backspace') backspacePinpad();
+        else if (e.key === 'Enter') submitPinpad();
+      }
+    });
+
+    function renderCartTable() {
+      const tbody = document.getElementById('cartTableRows');
+      tbody.innerHTML = '';
+
+      if (cart.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:45px 20px; color:var(--text-muted);">
+              <div style="font-size:42px; margin-bottom:12px; opacity:0.6;">🛒</div>
+              <div style="font-size:18px; font-weight:800; color:var(--brand-navy); margin-bottom:6px;">Seu Carrinho está Vazio</div>
+              <div style="font-size:13px; max-width:440px; margin:0 auto; line-height:1.5;">
+                Passe o código de barras no scanner óptico ou clique no botão <b>+ Adicionar Item</b> para digitar o código EAN-13 / PLU da mercadoria.
+              </div>
+            </td>
+          </tr>
+        `;
+        document.getElementById('lblSubtotal').textContent = 'R$ 0,00';
+        document.getElementById('lblDescontos').textContent = '-R$ 0,00';
+        document.getElementById('lblTotalFinal').textContent = 'R$ 0,00';
+        return;
+      }
+
+      let subtotal = 0;
+      cart.forEach((item, index) => {
+        subtotal += item.subtotal;
+        const tr = document.createElement('tr');
+        if (index === selectedCartIndex) tr.classList.add('selected');
+        tr.onclick = () => {
+          selectedCartIndex = (selectedCartIndex === index) ? -1 : index;
+          renderCartTable();
+        };
+
+        const qtyDisplay = item.unit === 'kg'
+          ? item.qty.toFixed(2).replace('.', ',') + ' kg'
+          : item.qty + ' un';
+
+        tr.innerHTML = `
+          <td><div class="thumb-cell">${item.code.slice(-3)}</div></td>
+          <td style="font-family:'JetBrains Mono',monospace;">${item.code}</td>
+          <td>
+            <div style="font-weight:700;">${item.name}</div>
+            ${item.isAlcohol ? '<span style="font-size:10px; color:#b91c1c; font-weight:800; background:#fee2e2; padding:2px 6px; border-radius:4px;">18+ ÁLCOOL</span>' : ''}
+          </td>
+          <td>R$ ${item.price.toFixed(2).replace('.', ',')}/${item.unit}</td>
+          <td>
+            <div class="qty-controls" onclick="event.stopPropagation()">
+              <button class="qty-btn" onclick="modifyItemQty(${index}, -1)">-</button>
+              <span style="font-weight:700;">${qtyDisplay}</span>
+              <button class="qty-btn" onclick="modifyItemQty(${index}, 1)">+</button>
+            </div>
+          </td>
+          <td style="font-weight:800; color:var(--brand-navy);">${formatBRL(item.subtotal)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const discount = subtotal >= 100 ? 19.90 : 0.00;
+      const total = Math.max(0, subtotal - discount);
+
+      document.getElementById('lblSubtotal').textContent = formatBRL(subtotal);
+      document.getElementById('lblDescontos').textContent = '-' + formatBRL(discount);
+      document.getElementById('lblTotalFinal').textContent = formatBRL(total);
+    }
+
+    function modifyItemQty(idx, delta) {
+      const item = cart[idx];
+      if (!item) return;
+
+      const step = item.unit === 'kg' ? 0.25 : 1;
+      const next = +(item.qty + delta * step).toFixed(2);
+
+      if (next <= 0) {
+        selectedCartIndex = idx;
+        requestItemRemoval();
+        return;
+      }
+
+      item.qty = next;
+      item.subtotal = +(item.qty * item.price).toFixed(2);
+      playBeep(1100, 0.05);
+      renderCartTable();
+    }
+
+    function scanProductByCode(code) {
+      const prod = productsDB[code];
+      if (!prod) {
+        playSoundError();
+        showToast(`Código ${code} não encontrado no banco de dados!`, true);
+        return;
+      }
+
+      if (prod.isAlcohol) {
+        playSoundError();
+        document.getElementById('modalAlcohol').classList.add('active');
+        return;
+      }
+
+      const existing = cart.find(i => i.code === code);
+      if (existing) {
+        const addQ = prod.unit === 'kg' ? 0.50 : 1;
+        existing.qty = +(existing.qty + addQ).toFixed(2);
+        existing.subtotal = +(existing.qty * existing.price).toFixed(2);
+      } else {
+        const initialQty = prod.unit === 'kg' ? 1.00 : 1;
+        cart.push({
+          code: prod.code,
+          name: prod.name,
+          price: prod.price,
+          unit: prod.unit,
+          qty: initialQty,
+          subtotal: +(initialQty * prod.price).toFixed(2),
+          weight: prod.weightNominal * initialQty,
+          isAlcohol: prod.isAlcohol
+        });
+      }
+
+      playBeep(1350, 0.07);
+      renderCartTable();
+      showToast(`Produto "${prod.name}" registrado e conferido na balança!`);
+    }
+
+    function handleBarcodeInput(val) {
+      const clean = val.trim();
+      if (!clean) return;
+      scanProductByCode(clean);
+      document.getElementById('inputBarcodeLive').value = '';
+    }
+
+    function openManualCodeModal() {
+      const code = prompt('Digite o código de barras EAN-13 ou PLU do produto:');
+      if (code) scanProductByCode(code.trim());
+    }
+
+    function requestItemRemoval() {
+      if (cart.length === 0) {
+        showToast('O carrinho está vazio!', true);
+        return;
+      }
+      if (selectedCartIndex === -1) selectedCartIndex = cart.length - 1;
+      const target = cart[selectedCartIndex];
+      supervisorAction = 'EXCLUIR_ITEM';
+      document.getElementById('supReasonLabel').textContent = `Autorização Fiscal para excluir item: [${target.code}] ${target.name}`;
+      openSupervisorPinModal('EXCLUIR_ITEM');
+    }
+
+    function requestCancelSale() {
+      if (cart.length === 0) {
+        showToast('Não há compra ativa para cancelar.');
+        return;
+      }
+      supervisorAction = 'CANCELAR_COMPRA';
+      document.getElementById('supReasonLabel').textContent = 'Autorização Fiscal para cancelamento total de venda';
+      openSupervisorPinModal('CANCELAR_COMPRA');
+    }
+
+    function goToPaymentSelection() {
+      if (cart.length === 0) {
+        playSoundError();
+        showToast('Adicione pelo menos 1 item ao carrinho antes de pagar!', true);
+        return;
+      }
+      navigate('s06');
+    }
+
+    function setPluCategory(cat, btn) {
+      selectedPluCategory = cat;
+      document.querySelectorAll('#pluTabs .catalog-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPluCatalog();
+    }
+
+    function renderPluCatalog() {
+      const query = (document.getElementById('pluSearchInput').value || '').toLowerCase();
+      const container = document.getElementById('pluGridContainer');
+      container.innerHTML = '';
+
+      pluCatalog.forEach((item, idx) => {
+        if (selectedPluCategory !== 'TODOS' && item.category !== selectedPluCategory) return;
+        if (query && !item.name.toLowerCase().includes(query) && !item.code.toLowerCase().includes(query)) return;
+
+        const card = document.createElement('div');
+        card.className = 'catalog-card' + (item === selectedPluItem ? ' selected' : '');
+        card.onclick = () => {
+          selectedPluItem = item;
+          renderPluCatalog();
+        };
+
+        card.innerHTML = `
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; font-weight:800; color:var(--text-muted);">${item.code}</span>
+              <span style="font-size:11px; font-weight:700; background:var(--bg-subtle); padding:2px 6px; border-radius:4px;">${item.category}</span>
+            </div>
+            <div style="font-size:15px; font-weight:900; color:var(--brand-navy); margin-top:6px;">${item.name}</div>
+            <div style="font-size:14px; font-weight:700; color:var(--brand-emerald-dark); margin-top:2px;">R$ ${item.price.toFixed(2).replace('.', ',')} / ${item.unit}</div>
+          </div>
+          <button class="btn btn-outline" style="width:100%; margin-top:10px; font-size:12px; padding:7px;">
+            ${item === selectedPluItem ? '✓ Item Selecionado' : 'Selecionar Item'}
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterPluCatalog() {
+      renderPluCatalog();
+    }
+
+    function goToWeighSelected() {
+      navigate('s05');
+    }
+
+    function adjustWeighSlider(val) {
+      document.getElementById('weighSlider').value = val;
+      updateWeighReadout();
+    }
+
+    function updateWeighReadout() {
+      const item = selectedPluItem || pluCatalog[0];
+      const weight = parseFloat(document.getElementById('weighSlider').value || '0.350');
+      const total = +(weight * item.price).toFixed(2);
+
+      document.getElementById('lblScaleWeightText').textContent = `PESO: ${weight.toFixed(3).replace('.', ',')} kg`;
+      document.getElementById('lblScaleTotalText').textContent = `TOTAL: ${formatBRL(total)}`;
+      document.getElementById('lblScaleItemName').textContent = item.name;
+      document.getElementById('lblScaleItemPrice').textContent = `Preço por kg: R$ ${item.price.toFixed(2).replace('.', ',')}`;
+    }
+
+    function confirmWeighingToCart() {
+      const item = selectedPluItem || pluCatalog[0];
+      const weight = parseFloat(document.getElementById('weighSlider').value || '0.350');
+      const subtotal = +(weight * item.price).toFixed(2);
+
+      cart.push({
+        code: item.code,
+        name: item.name,
+        price: item.price,
+        unit: 'kg',
+        qty: +weight.toFixed(2),
+        subtotal: subtotal,
+        weight: weight,
+        isAlcohol: false
+      });
+
+      playSoundSuccess();
+      showToast(`${item.name} (${weight.toFixed(3).replace('.', ',')} kg) adicionado ao carrinho!`);
+      navigate('s03');
+    }
+
+    function setupPaymentScreen() {
+      const subtotal = cart.reduce((acc, i) => acc + i.subtotal, 0);
+      const discount = subtotal >= 100 ? 19.90 : 0.00;
+      const total = Math.max(0, subtotal - discount);
+
+      document.getElementById('paySubtotalVal').textContent = formatBRL(subtotal);
+      document.getElementById('payDiscountVal').textContent = '-' + formatBRL(discount);
+      document.getElementById('payTotalVal').textContent = formatBRL(total);
+
+      startPixTimer();
+    }
+
+    function setPaymentModality(mode) {
+      session.paymentModality = mode === 'PIX' ? 'PIX DINÂMICO'
+        : mode === 'CREDITO' ? 'CARTÃO DE CRÉDITO'
+        : mode === 'DEBITO' ? 'CARTÃO DE DÉBITO' : 'VALE-ALIMENTAÇÃO';
+
+      document.getElementById('btnPayPix').classList.toggle('active', mode === 'PIX');
+      document.getElementById('btnPayCredit').classList.toggle('active', mode === 'CREDITO');
+      document.getElementById('btnPayDebit').classList.toggle('active', mode === 'DEBITO');
+      document.getElementById('btnPayVoucher').classList.toggle('active', mode === 'VOUCHER');
+
+      const panelPix = document.getElementById('panelPixArea');
+      const panelCard = document.getElementById('panelCardArea');
+      const lblActive = document.getElementById('lblActivePayMode');
+      const lblStatus = document.getElementById('lblPayModeStatusText');
+
+      if (lblActive) lblActive.textContent = session.paymentModality;
+
+      if (mode === 'PIX') {
+        if (panelPix) panelPix.style.display = 'flex';
+        if (panelCard) panelCard.style.display = 'none';
+        if (lblStatus) lblStatus.textContent = '✓ Aguardando leitura do QR Code';
+        startPixTimer();
+      } else {
+        if (panelPix) panelPix.style.display = 'none';
+        if (panelCard) panelCard.style.display = 'flex';
+        const lblTitle = document.getElementById('lblCardTitle');
+        if (lblTitle) lblTitle.textContent = `PAGAMENTO COM ${session.paymentModality}`;
+        if (lblStatus) lblStatus.textContent = '✓ Aguardando aproximação ou inserção';
+        clearInterval(pixTimerInterval);
+
+        pinpadPinBuffer = '';
+        pinpadCardInserted = false;
+        updatePinpadUI('APROXIME OU INSIRA');
+      }
+
+      playKeyClick();
+    }
+
+    function startPixTimer() {
+      clearInterval(pixTimerInterval);
+      session.pixCountdown = 119;
+      pixTimerInterval = setInterval(() => {
+        session.pixCountdown--;
+        if (session.pixCountdown <= 0) {
+          clearInterval(pixTimerInterval);
+          session.pixCountdown = 120;
+        }
+        const min = String(Math.floor(session.pixCountdown / 60)).padStart(2, '0');
+        const sec = String(session.pixCountdown % 60).padStart(2, '0');
+        const t = document.getElementById('pixTimerText');
+        if (t) t.textContent = `Tempo restante para pagamento: ${min}:${sec}`;
+      }, 1000);
+    }
+
+    function copyPixCode(btn) {
+      const pixPayload = '00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-426614174000520400005303986540500.005802BR5913GOSELF STORE6009SAO PAULO62070503***6304ABCD';
+      try {
+        navigator.clipboard.writeText(pixPayload);
+      } catch (e) {}
+      if (btn) {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '✓ Código Pix Copiado!';
+        btn.style.borderColor = 'var(--brand-emerald)';
+        btn.style.color = 'var(--brand-emerald-dark)';
+        setTimeout(() => {
+          btn.innerHTML = orig;
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }, 3000);
+      }
+      playSoundSuccess();
+      showToast('Código Pix Copia e Cola copiado para a área de transferência!');
+    }
+
+    function updatePinpadUI(statusText) {
+      const screen = document.getElementById('pinpadScreenText');
+      if (statusText) {
+        screen.innerHTML = `<div>${statusText}</div><div class="pinpad-pin-dots" id="pinpadPinDots"></div>`;
+      }
+      const activeDots = document.getElementById('pinpadPinDots');
+      if (activeDots) {
+        activeDots.textContent = '• '.repeat(pinpadPinBuffer.length);
+      }
+    }
+
+    function simulateCardInsert() {
+      pinpadCardInserted = true;
+      pinpadPinBuffer = '';
+      playBeep(980, 0.08, 'sine');
+      updatePinpadUI('LENDO CHIP EMV...');
+      const btn = document.getElementById('btnSimulateCardInsert');
+      if (btn) btn.textContent = '✓ Cartão Inserido (Chip Conectado)';
+
+      setTimeout(() => {
+        playBeep(1200, 0.05, 'triangle');
+        updatePinpadUI('DIGITE A SENHA DE 4 DÍGITOS');
+      }, 750);
+    }
+
+    function pressPinpadDigit(d) {
+      if (!pinpadCardInserted) {
+        simulateCardInsert();
+      }
+      if (pinpadPinBuffer.length < 4) {
+        pinpadPinBuffer += d;
+        playKeyClick();
+        updatePinpadUI(pinpadPinBuffer.length === 4 ? 'SENHA OK - TECLE ENTRA' : 'DIGITE A SENHA DE 4 DÍGITOS');
+      }
+    }
+
+    function backspacePinpad() {
+      if (pinpadPinBuffer.length > 0) {
+        pinpadPinBuffer = pinpadPinBuffer.slice(0, -1);
+        playKeyClick();
+        updatePinpadUI('DIGITE A SENHA DE 4 DÍGITOS');
+      }
+    }
+
+    function submitPinpad() {
+      if (pinpadPinBuffer.length < 4) {
+        playSoundError();
+        updatePinpadUI('DIGITE OS 4 DÍGITOS!');
+        showToast('Por favor, informe a senha de 4 dígitos no teclado do Pinpad.', true);
+        return;
+      }
+
+      playBeep(880, 0.1, 'sine');
+      updatePinpadUI('PROCESSANDO TEF...');
+      const btnConfirm = document.getElementById('btnConfirmPayment');
+      if (btnConfirm) btnConfirm.disabled = true;
+
+      setTimeout(() => {
+        updatePinpadUI('AUTORIZADO COM SUCESSO!');
+        playSoundSuccess();
+        setTimeout(() => {
+          if (btnConfirm) btnConfirm.disabled = false;
+          confirmPaymentSuccess();
+        }, 900);
+      }, 1200);
+    }
+
+    function confirmPaymentSuccess() {
+      clearInterval(pixTimerInterval);
+      playSoundSuccess();
+      showToast(`Pagamento via ${session.paymentModality} autorizado pelo gateway SEFAZ!`);
+      navigate('s07');
+    }
+
+    let currentNpsStars = 5;
+
+    function setNpsRating(stars) {
+      currentNpsStars = stars;
+      document.querySelectorAll('#starRow .star-btn').forEach((b, idx) => {
+        b.classList.toggle('active', idx < stars);
+      });
+      const desc = ['', '1 Estrela — Precisa Melhorar', '2 Estrelas — Regular', '3 Estrelas — Bom Atendimento', '4 Estrelas — Muito Bom!', '5 Estrelas — Atendimento Excelente!'];
+      document.getElementById('lblRatingText').textContent = desc[stars];
+      playKeyClick();
+    }
+
+    function submitRatingAndFinish() {
+      playSoundSuccess();
+      showToast('Obrigado pela sua avaliação! Imprimindo comprovante fiscal NFC-e...');
+      navigate('s08');
+    }
+
+    function renderFiscalReceipt() {
+      const list = document.getElementById('recItemsList');
+      const subtotal = cart.reduce((acc, i) => acc + i.subtotal, 0);
+      const discount = subtotal >= 100 ? 19.90 : 0.00;
+      const total = Math.max(0, subtotal - discount);
+
+      list.innerHTML = cart.map(i => `
+        <div style="display:flex; justify-content:space-between; margin:3px 0;">
+          <span>${i.code} ${i.name.toUpperCase()} (${i.qty} ${i.unit})</span>
+          <strong>${formatBRL(i.subtotal)}</strong>
+        </div>
+      `).join('');
+
+      document.getElementById('recCpf').textContent = session.cpf ? `${session.cpf.slice(0,3)}.${session.cpf.slice(3,6)}.${session.cpf.slice(6,9)}-${session.cpf.slice(9,11)}` : 'CONSUMIDOR NÃO IDENTIFICADO';
+      document.getElementById('recPaymentMode').textContent = session.paymentModality;
+      document.getElementById('recTotalVal').textContent = formatBRL(total);
+
+      if (window.GoSelfSync && cart.length > 0 && !session.saleRecorded) {
+        session.saleRecorded = true;
+        window.GoSelfSync.recordCompletedSale({
+          totem: 'TOTEM-03',
+          cpf: session.cpf || 'CONSUMIDOR NÃO IDENTIFICADO',
+          total: total,
+          paymentMode: session.paymentModality,
+          items: JSON.parse(JSON.stringify(cart))
+        });
+      }
+    }
+
+    function closeEmailSentModal() {
+      const modal = document.getElementById('modalEmailSent');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function openNativeMailClient() {
+      const input = document.getElementById('receiptEmailInput');
+      const email = (input ? input.value : '').trim() || 'cliente@email.com';
+      const total = document.getElementById('recTotalVal') ? document.getElementById('recTotalVal').textContent : 'R$ 0,00';
+      const chave = document.getElementById('recChaveAcesso') ? document.getElementById('recChaveAcesso').textContent : '3526 1012 3456 7800 0190 6500 1000 0184 7219 2837 4651';
+      const subject = encodeURIComponent('[NFC-e] GoSelf Supermercados - Cupom Fiscal Eletrônico');
+      const body = encodeURIComponent(`Olá,\n\nSegue o comprovante DANFE da Nota Fiscal de Consumidor Eletrônica (NFC-e) de sua compra no Totem GoSelf:\n\nValor Total: ${total}\nModalidade: ${session.paymentModality}\nChave de Acesso SEFAZ:\n${chave}\n\nObrigado por utilizar o GoSelf Supermercados!`);
+      window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+    }
+
+    function sendReceiptByEmail() {
+      const input = document.getElementById('receiptEmailInput');
+      const status = document.getElementById('emailReceiptStatus');
+      const btn = document.getElementById('btnSendEmailReceipt');
+      const email = (input ? input.value : '').trim();
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        if (status) {
+          status.style.display = 'block';
+          status.style.color = 'var(--brand-danger-dark)';
+          status.textContent = '⚠️ Por favor, informe um endereço de e-mail válido (ex: cliente@email.com).';
+        }
+        playSoundError();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      if (status) {
+        status.style.display = 'block';
+        status.style.color = 'var(--brand-blue)';
+        status.textContent = 'Conectando ao gateway de mensageria SEFAZ...';
+      }
+
+      setTimeout(() => {
+        btn.textContent = '✓ Enviado';
+        btn.style.background = '#059669';
+        if (input) input.disabled = true;
+        if (status) {
+          status.style.color = 'var(--brand-emerald-dark)';
+          status.textContent = `✓ Comprovante fiscal DANFE e chave XML enviados com sucesso para ${email}!`;
+        }
+        playSoundSuccess();
+        showToast(`Comprovante fiscal enviado para ${email}!`);
+
+        const totalStr = document.getElementById('recTotalVal') ? document.getElementById('recTotalVal').textContent : 'R$ 0,00';
+        const chaveAcesso = document.getElementById('recChaveAcesso') ? document.getElementById('recChaveAcesso').textContent : '3526 1012 3456 7800 0190 6500 1000 0184 7219 2837 4651';
+
+        const recSpan = document.getElementById('modalEmailRecipient');
+        if (recSpan) recSpan.textContent = email;
+        const timeSpan = document.getElementById('modalEmailTimestamp');
+        if (timeSpan) timeSpan.textContent = new Date().toLocaleString('pt-BR');
+        const keySpan = document.getElementById('modalEmailKey');
+        if (keySpan) keySpan.textContent = chaveAcesso;
+
+        const emailModal = document.getElementById('modalEmailSent');
+        if (emailModal) emailModal.classList.add('active');
+
+        if (window.GoSelfSync) {
+          window.GoSelfSync.publish('EMAIL_RECEIPT_SENT', {
+            totem: 'TOTEM-03',
+            email: email,
+            cpf: session.cpf || 'CONSUMIDOR NÃO IDENTIFICADO',
+            total: totalStr,
+            chaveAcesso: chaveAcesso
+          });
+          window.GoSelfSync.addAuditLog({
+            totem: 'TOTEM-03',
+            operator: 'CONSUMIDOR (TOTEM)',
+            action: 'Envio de NFC-e por E-mail',
+            details: `Comprovante digital enviado para o e-mail: ${email}`,
+            value: totalStr
+          });
+        }
+      }, 700);
+    }
+
+    function resetKioskSession() {
+      session.cpf = '';
+      session.isIdentified = false;
+      session.saleRecorded = false;
+      cpfInputDigits = '';
+      selectedCartIndex = -1;
+      document.getElementById('activeCpfHeader').style.display = 'none';
+
+      const emailInput = document.getElementById('receiptEmailInput');
+      if (emailInput) {
+        emailInput.value = '';
+        emailInput.disabled = false;
+      }
+      const emailStatus = document.getElementById('emailReceiptStatus');
+      if (emailStatus) emailStatus.style.display = 'none';
+      const btnEmail = document.getElementById('btnSendEmailReceipt');
+      if (btnEmail) {
+        btnEmail.disabled = false;
+        btnEmail.textContent = 'Enviar E-mail';
+        btnEmail.style.background = '';
+      }
+
+      cart = [];
+      renderCartTable();
+
+      const andon = document.getElementById('andonDot');
+      if (andon) andon.className = 'andon-dot';
+
+      if (window.GoSelfSync) {
+        window.GoSelfSync.updateTotemState('TOTEM-03', {
+          status: 'STANDBY',
+          andon: 'GREEN',
+          cartCount: 0,
+          cartTotal: 0
+        });
+      }
+
+      navigate('s01');
+      playSoundSuccess();
+      showToast('Sessão finalizada. Totem pronto para o próximo cliente!');
+    }
+
+    function openSupervisorPinModal(action) {
+      supervisorAction = action;
+      supervisorPinBuffer = '';
+      updateSupPinDisplay();
+      document.getElementById('modalDivergence').classList.remove('active');
+      document.getElementById('modalAlcohol').classList.remove('active');
+      document.getElementById('modalSupervisor').classList.add('active');
+    }
+
+    function closeSupervisorModal() {
+      document.getElementById('modalSupervisor').classList.remove('active');
+    }
+
+    function pressSupDigit(d) {
+      if (supervisorPinBuffer.length < 4) {
+        supervisorPinBuffer += d;
+        playKeyClick();
+        updateSupPinDisplay();
+      }
+    }
+
+    function clearSupPin() {
+      supervisorPinBuffer = '';
+      updateSupPinDisplay();
+    }
+
+    function backspaceSupPin() {
+      supervisorPinBuffer = supervisorPinBuffer.slice(0, -1);
+      updateSupPinDisplay();
+    }
+
+    function updateSupPinDisplay() {
+      const dots = supervisorPinBuffer.split('').map(() => '●').join(' ');
+      document.getElementById('supPinDisplay').textContent = dots || '_ _ _ _';
+    }
+
+    function confirmSupervisorPin() {
+      if (supervisorPinBuffer !== '1234' && supervisorPinBuffer !== '8888' && supervisorPinBuffer !== '9999') {
+        playSoundError();
+        showToast('PIN do Fiscal incorreto! Acesso não autorizado.', true);
+        return;
+      }
+
+      closeSupervisorModal();
+      playSoundSuccess();
+
+      if (supervisorAction === 'EXCLUIR_ITEM') {
+        if (selectedCartIndex >= 0 && selectedCartIndex < cart.length) {
+          const removed = cart.splice(selectedCartIndex, 1)[0];
+          selectedCartIndex = -1;
+          renderCartTable();
+          showToast(`Item "${removed.name}" excluído pelo Fiscal (Log de Auditoria gravado).`);
+          if (window.GoSelfSync) {
+            window.GoSelfSync.addAuditLog({
+              totem: 'TOTEM-03',
+              operator: 'OP-2026 (Fiscal)',
+              action: 'Exclusão de Item Autorizada',
+              details: `Exclusão do item [${removed.code}] ${removed.name} autorizada com PIN`,
+              value: '-' + formatBRL(removed.subtotal)
+            });
+          }
+        }
+      } else if (supervisorAction === 'CANCELAR_COMPRA') {
+        cart = [];
+        resetKioskSession();
+        showToast('Venda cancelada pelo Fiscal de Loja.');
+        if (window.GoSelfSync) {
+          window.GoSelfSync.addAuditLog({
+            totem: 'TOTEM-03',
+            operator: 'OP-2026 (Fiscal)',
+            action: 'Cancelamento Total de Compra',
+            details: 'Venda cancelada integralmente pelo supervisor',
+            value: 'R$ 0,00'
+          });
+        }
+      } else if (supervisorAction === 'LIBERAR_DIVERGENCIA') {
+        document.getElementById('andonDot').classList.remove('danger');
+        showToast('Divergência de peso liberada pelo Fiscal de Loja.');
+        if (window.GoSelfSync) {
+          window.GoSelfSync.addAuditLog({
+            totem: 'TOTEM-03',
+            operator: 'OP-2026 (Fiscal)',
+            action: 'Liberação de Divergência',
+            details: 'Divergência de peso liberada no terminal físico com PIN',
+            value: 'R$ 0,00'
+          });
+          window.GoSelfSync.updateTotemState('TOTEM-03', { andon: 'GREEN', status: 'EM_COMPRA' });
+        }
+      } else if (supervisorAction === 'LIBERAR_18_ANOS') {
+        cart.push({
+          code: '78911',
+          name: 'Cerveja Artesanal IPA 500ml',
+          price: 14.90,
+          unit: 'uni',
+          qty: 1,
+          subtotal: 14.90,
+          weight: 0.53,
+          isAlcohol: true
+        });
+        renderCartTable();
+        showToast('Idade 18+ confirmada pelo Fiscal. Bebida adicionada ao carrinho!');
+        if (window.GoSelfSync) {
+          window.GoSelfSync.addAuditLog({
+            totem: 'TOTEM-03',
+            operator: 'OP-2026 (Fiscal)',
+            action: 'Liberação de Bebida 18+',
+            details: 'Documento oficial com foto verificado presencialmente',
+            value: 'R$ 14,90'
+          });
+        }
+      }
+    }
+
+    function triggerDivergenceTest() {
+      playSoundError();
+      document.getElementById('andonDot').classList.add('danger');
+      document.getElementById('modalDivergence').classList.add('active');
+      if (window.GoSelfSync) {
+        window.GoSelfSync.reportDivergence('TOTEM-03', 'Divergência de peso na Balança Toledo Prix 3 Fit');
+      }
+    }
+
+    function closeDivergenceModal() {
+      document.getElementById('modalDivergence').classList.remove('active');
+      document.getElementById('andonDot').classList.remove('danger');
+      if (window.GoSelfSync) {
+        window.GoSelfSync.updateTotemState('TOTEM-03', { andon: 'GREEN', status: cart.length > 0 ? 'EM_COMPRA' : 'STANDBY' });
+      }
+    }
+
+    function triggerAlcoholScan() {
+      scanProductByCode('78911');
+    }
+
+    function cancelAlcoholItem() {
+      document.getElementById('modalAlcohol').classList.remove('active');
+      showToast('Item alcoólico cancelado pelo cliente.');
+    }
+
+    function playSoundNotification() {
+      playBeep(880, 0.12, 'sine');
+      setTimeout(() => playBeep(1174.66, 0.25, 'sine'), 120);
+    }
+
+    function requestAttendantHelp(reason) {
+      playSoundNotification();
+      const andon = document.getElementById('andonDot');
+      if (andon) {
+        andon.className = 'andon-dot warning';
+      }
+
+      const reasonDisplay = document.getElementById('helpReasonDisplay');
+      if (reasonDisplay) {
+        reasonDisplay.textContent = reason || 'Solicitação de auxílio no terminal';
+      }
+
+      document.getElementById('modalCustomerHelp').classList.add('active');
+      showToast('Chamado enviado ao Fiscal de Loja! Torre Andon em alerta amarelo.');
+
+      if (window.GoSelfSync) {
+        window.GoSelfSync.requestAttendantCall('TOTEM-03', reason || 'Solicitação de auxílio no terminal');
+      }
+    }
+
+    function cancelCustomerHelp() {
+      document.getElementById('modalCustomerHelp').classList.remove('active');
+      const andon = document.getElementById('andonDot');
+      if (andon) {
+        andon.className = 'andon-dot';
+      }
+      showToast('Chamado de atendimento cancelado.');
+
+      if (window.GoSelfSync) {
+        window.GoSelfSync.cancelCallByTotem('TOTEM-03');
+      }
+    }
+
+    function dismissCustomerHelpAlert() {
+      document.getElementById('modalCustomerHelp').classList.remove('active');
+    }
+
+    function switchBackofficeTab(tab) {
+      document.getElementById('tabTech').classList.toggle('active', tab === 'TECH');
+      document.getElementById('tabStock').classList.toggle('active', tab === 'STOCK');
+      document.getElementById('tabAdmin').classList.toggle('active', tab === 'ADMIN');
+
+      document.getElementById('viewTech').style.display = (tab === 'TECH') ? 'grid' : 'none';
+      document.getElementById('viewStock').style.display = (tab === 'STOCK') ? 'flex' : 'none';
+      document.getElementById('viewAdmin').style.display = (tab === 'ADMIN') ? 'flex' : 'none';
+
+      const titles = {
+        'TECH': 'PAINEL DO TÉCNICO DE SUPORTE',
+        'STOCK': 'PAINEL DO RESPONSÁVEL PELO ESTOQUE',
+        'ADMIN': 'PAINEL DO ADMINISTRADOR & AUDITORIA'
+      };
+      document.getElementById('adminTitle').textContent = titles[tab];
+      if (tab === 'STOCK') renderStockCrud();
+    }
+
+    function renderStockCrud() {
+      const tbody = document.getElementById('stockCrudRows');
+      tbody.innerHTML = Object.values(productsDB).map(p => `
+        <tr>
+          <td style="font-family:'JetBrains Mono',monospace;">${p.code}</td>
+          <td>${p.name}</td>
+          <td><span style="background:#f1f5f9; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;">${p.category}</span></td>
+          <td>R$ ${p.price.toFixed(2).replace('.', ',')} / ${p.unit}</td>
+          <td><strong style="color:var(--brand-emerald-dark);">${p.stock} ${p.unit}</strong></td>
+          <td>
+            <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="addStockUnits('${p.code}')">+ Repor</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function addStockUnits(code) {
+      const p = productsDB[code];
+      if (p) {
+        p.stock += 50;
+        renderStockCrud();
+        playSoundSuccess();
+        showToast(`+50 unidades repostas para "${p.name}". Saldo: ${p.stock}`);
+      }
+    }
+
+    function addNewStockProductModal() {
+      const name = prompt('Nome do novo produto para cadastrar no catálogo:');
+      if (!name || !name.trim()) return;
+      const priceStr = prompt(`Preço unitário em R$ para "${name.trim()}" (ex: 15.90):`);
+      if (!priceStr) return;
+      const price = parseFloat(priceStr.replace(',', '.')) || 9.90;
+      const code = String(Math.floor(30000 + Math.random() * 60000));
+      productsDB[code] = {
+        code: code,
+        name: name.trim(),
+        category: 'MERCEARIA',
+        unit: 'uni',
+        price: price,
+        weightNominal: 0.500,
+        pesavel: false,
+        isAlcohol: false,
+        stock: 100
+      };
+      if (window.GoSelfSync) {
+        const cat = window.GoSelfSync.getCatalog();
+        cat.push(productsDB[code]);
+        window.GoSelfSync.saveCatalog(cat);
+      }
+      renderStockCrud();
+      playSoundSuccess();
+      showToast(`Produto [${code}] ${name.trim()} cadastrado com sucesso!`);
+    }
+
+    function testAllPeripherals() {
+      playSoundSuccess();
+      showToast('Auto-teste concluído: Leitor Óptico, Balança Toledo, Impressora MP-4200 e Pinpad 100% OK!');
+    }
+
+    function syncCatalogFromStore() {
+      if (window.GoSelfSync) {
+        const cat = window.GoSelfSync.getCatalog();
+        cat.forEach(p => {
+          productsDB[p.code] = {
+            code: p.code,
+            name: p.name,
+            category: p.category,
+            unit: p.unit,
+            price: p.price,
+            weightNominal: p.weightNominal || 0.1,
+            pesavel: !!p.pesavel,
+            isAlcohol: !!p.isAlcohol,
+            stock: p.stock
+          };
+        });
+      }
+    }
+
+    if (window.GoSelfSync) {
+      syncCatalogFromStore();
+
+      window.GoSelfSync.subscribe('CALL_RESOLVED', (call) => {
+        if (call.totem === 'TOTEM-03') {
+          document.getElementById('modalCustomerHelp').classList.remove('active');
+          const andon = document.getElementById('andonDot');
+          if (andon) andon.className = 'andon-dot';
+          playSoundSuccess();
+          showToast(`Chamado atendido e finalizado pelo ${call.operator || 'Fiscal de Loja'}!`);
+        }
+      });
+
+      window.GoSelfSync.subscribe('REMOTE_UNLOCKED', (data) => {
+        if (data.totem === 'TOTEM-03') {
+          document.getElementById('modalDivergence').classList.remove('active');
+          const andon = document.getElementById('andonDot');
+          if (andon) andon.className = 'andon-dot';
+          playSoundSuccess();
+          showToast(`Balança desbloqueada remotamente pelo ${data.operator || 'Fiscal'}!`);
+        }
+      });
+
+      window.GoSelfSync.subscribe('CATALOG_UPDATED', () => {
+        syncCatalogFromStore();
+        if (session.activeStep === 's04') renderPluCatalog();
+        showToast('Catálogo sincronizado com a Retaguarda!');
+      });
+
+      window.GoSelfSync.subscribe('STORE_RESET', () => {
+        resetKioskSession();
+        showToast('Base reiniciada! Totem redefinido para estado inicial limpo.');
+      });
+
+      setInterval(() => {
+        const subtotal = cart.reduce((acc, i) => acc + i.subtotal, 0);
+        const discount = subtotal >= 100 ? 19.90 : 0.00;
+        const total = Math.max(0, subtotal - discount);
+        const andonDot = document.getElementById('andonDot');
+        const andonState = andonDot.classList.contains('danger') ? 'RED' :
+                           andonDot.classList.contains('warning') ? 'YELLOW' : 'GREEN';
+
+        window.GoSelfSync.updateTotemState('TOTEM-03', {
+          name: 'Totem #03 (Demonstração)',
+          activeStep: session.activeStep,
+          cartCount: cart.length,
+          cartTotal: total,
+          andon: andonState,
+          status: andonState === 'RED' ? 'DIVERGENCIA' :
+                  andonState === 'YELLOW' ? 'CHAMADO' :
+                  (cart.length > 0 ? 'EM_COMPRA' : 'STANDBY')
+        });
+      }, 2500);
+    }
+
+    const savedLang = (function() {
+      try { return localStorage.getItem('goself_selected_lang') || 'PT'; } catch(e) { return 'PT'; }
+    })();
+    changeLanguage(savedLang);
+    renderCartTable();
+    renderPluCatalog();
+  </script>
+</body>
+</html>

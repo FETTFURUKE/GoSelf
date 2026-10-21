@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoSelf — Soluções de Autoatendimento para Varejo | Mundo SENAI</title>
+  <meta name="description" content="Central Oficial GoSelf: Apresentação Canva, Totem PDV, Painel Admin, Requisitos, Diagramas UML, Figma e Canvas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #080d1a;
+      --bg-card: #0f172a;
+      --bg-card-hover: #162038;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --goself-blue: #0284c7;
+      --goself-blue-light: #38bdf8;
+      --goself-orange: #f97316;
+      --goself-orange-light: #fb923c;
+      --goself-emerald: #10b981;
+      --goself-purple: #a855f7;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-full: 9999px;
+      --shadow-glow: 0 0 35px rgba(2, 132, 199, 0.2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(2, 132, 199, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 25%, rgba(249, 115, 22, 0.10) 0%, transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      padding: 20px 16px 60px;
+    }
+
+    .container {
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    /* HEADER & HERO BRANDING */
+    header {
+      text-align: center;
+      padding: 30px 16px 20px;
+    }
+
+    .brand-logo-hero {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .logo-symbol {
+      width: 58px;
+      height: 58px;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.4);
+      position: relative;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .logo-symbol svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    .brand-title {
+      font-size: clamp(2.6rem, 6.5vw, 4.2rem);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: baseline;
+    }
+
+    .brand-title .brand-go {
+      color: #38bdf8;
+      text-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+    }
+
+    .brand-title .brand-self {
+      color: #fb923c;
+      text-shadow: 0 0 30px rgba(251, 146, 60, 0.4);
+    }
+
+    .brand-tagline {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .event-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(2, 132, 199, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      margin-top: 14px;
+      text-transform: uppercase;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #38bdf8;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #38bdf8;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      font-size: 0.86rem;
+      color: var(--text-dim);
+      margin-top: 18px;
+    }
+
+    .meta-chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 14px;
+      border-radius: var(--radius-sm);
+    }
+
+    .meta-chip strong {
+      color: var(--text-main);
+    }
+
+    /* CARD DE QR CODE EM DESTAQUE */
+    .qr-banner-card {
+      background: linear-gradient(145deg, #0e1a2e 0%, #0c1424 100%);
+      border: 1.5px solid rgba(56, 189, 248, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 26px 28px;
+      margin: 28px 0 34px;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6), 0 0 30px rgba(2, 132, 199, 0.15);
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 26px;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .qr-banner-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+
+    .qr-banner-info h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .qr-banner-info p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .url-input-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .url-input {
+      flex: 1;
+      background: #090f1d;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #38bdf8;
+      outline: none;
+    }
+
+    .btn-action-primary {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 10px 18px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-action-primary:hover {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      transform: translateY(-1px);
+    }
+
+    .btn-action-subtle {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-action-subtle:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .qr-box-white {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      margin: 0 auto;
+      width: fit-content;
+    }
+
+    #qrcode-canvas-container {
+      width: 170px;
+      height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qrcode-canvas-container img {
+      width: 170px !important;
+      height: 170px !important;
+      display: block;
+    }
+
+    .qr-subtext {
+      color: #0f172a;
+      font-size: 0.68rem;
+      font-weight: 800;
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    /* SECTIONS & HEADINGS */
+    .section-label {
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--goself-blue-light);
+      margin: 32px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border-subtle), transparent);
+    }
+
+    /* GRID DE CARDS */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 16px;
+    }
+
+    .project-card {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(11, 18, 33, 0.95) 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.15);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .card-icon-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .platform-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-heading {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .card-description {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+      flex-grow: 1;
+    }
+
+    .card-button-footer {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      transition: all 0.2s;
+    }
+
+    .project-card:hover .card-button-footer {
+      background: #0284c7;
+      border-color: #0284c7;
+      color: #ffffff;
+    }
+
+    /* ESTILOS TEMÁTICOS ESPECÍFICOS POR CARD */
+    .card-canva:hover .card-button-footer { background: #8b5cf6; border-color: #8b5cf6; }
+    .card-totem:hover .card-button-footer { background: #10b981; border-color: #10b981; }
+    .card-admin:hover .card-button-footer { background: #0284c7; border-color: #0284c7; }
+    .card-figma:hover .card-button-footer { background: #ec4899; border-color: #ec4899; }
+    .card-lucid:hover .card-button-footer { background: #f97316; border-color: #f97316; }
+    .card-miro:hover .card-button-footer { background: #eab308; border-color: #eab308; color: #0f172a; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding-top: 36px;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border-subtle);
+      margin-top: 48px;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--goself-blue);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.88rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- HEADER HERO -->
+    <header>
+      <div class="brand-logo-hero">
+        <div class="logo-symbol">
+          <!-- Monograma SVG GoSelf: Smartphone azul com seta dinâmica laranja -->
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="4" width="18" height="28" rx="4" stroke="#ffffff" stroke-width="2.5" />
+            <circle cx="14" cy="28" r="1.5" fill="#ffffff" />
+            <path d="M12 20L29 7M29 7H20M29 7V16" stroke="#fb923c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="brand-title">
+          <span class="brand-go">Go</span><span class="brand-self">Self</span>
+        </div>
+      </div>
+      
+      <div class="brand-tagline">Soluções de Autoatendimento para Varejo</div>
+      
+      <div>
+        <span class="event-badge">
+          <span class="pulse-dot"></span>
+          Central Oficial da Situação de Aprendizagem • Mundo SENAI 2026
+        </span>
+      </div>
+
+      <div class="meta-bar">
+        <span class="meta-chip">👤 Aluno: <strong>João A. Bernardo</strong></span>
+        <span class="meta-chip">🎓 Curso: <strong>TDESI 2026/1</strong></span>
+        <span class="meta-chip">👨‍🏫 Orientador: <strong>Prof. Kleber Kamers</strong></span>
+        <span class="meta-chip">📚 UC: <strong>Modelagem de Sistemas (MOSI)</strong></span>
+      </div>
+    </header>
+
+    <!-- BANNER DINÂMICO DE QR CODE -->
+    <div class="qr-banner-card">
+      <div class="qr-banner-info">
+        <h2>📱 QR Code Oficial para Avaliadores & Banca</h2>
+        <p>Aponte a câmera do seu smartphone para o código ao lado para acessar instantaneamente toda a modelagem de engenharia, diagramas UML, protótipos e apresentação oficial.</p>
+        
+        <div class="url-input-container">
+          <input type="text" id="qr-target-url" class="url-input" value="https://fettfuruke.github.io/GoSelf/" placeholder="https://fettfuruke.github.io/GoSelf/">
+          <button class="btn-action-subtle" onclick="copyCurrentLink()">Copiar</button>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-action-primary" onclick="downloadQRCodePNG()">⬇️ Baixar QR Code (PNG 1000x1000)</button>
+          <button class="btn-action-subtle" onclick="updateQRFromInput()">Atualizar QR</button>
+        </div>
+      </div>
+
+      <div class="qr-box-white">
+        <div id="qrcode-canvas-container"></div>
+        <div class="qr-subtext">Escaneie com a Câmera</div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 1: APRESENTAÇÃO & SISTEMAS VIVOS -->
+    <div class="section-label">⚡ Apresentação Executiva & Sistemas Interativos</div>
+    <div class="cards-grid">
+
+      <!-- 1. CANVA -->
+      <a href="https://canva.link/llmqjqr6bnrnys4" target="_blank" rel="noopener noreferrer" class="project-card card-canva">
+        <div>
+          <div class="card-top">
+            <div class="card-icon-badge" style="background:rgba(168,85,247,0.12); color:#c084fc;">📊</div>
+            <span class="platform-pill" style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3);">Canva</span>
+          </div>
+          <h3 class="card-heading">Apresentação Oficial (Pitch)</h3>
+          <p class="card-description">Apresentação executiva oficial no Canva demonstrando o modelo de negócio, problema das perdas no varejo e diferenciais do GoSelf.</p>
+        </div>
+        <span class="card-button-footer">Abrir Apresentação no Canva →</span>
+      </a>
+
+      <!-- 2. TOTEM PDV -->
+      <a href="sistema.html" target="_blank" class="project-card card-totem">
+        <div>
+          <div class="card-top">
+            <div class="card-icon-badge" style="background:rgba(16,185,129,0.12); color:#34d399;">🛒</div>
+            <span class="platform-pill" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3);">Totem PDV</span>
+          </div>
+          <h3 class="card-heading">Totem Frente de Caixa</h3>
+          <p class="card-description">Terminal interativo completo com CPF obrigatório, catálogo PLU, bipagem de produtos, conferência em balança Toledo e pagamentos PIX/TEF.</p>
+        </div>
+        <span class="card-button-footer">Testar Totem Interativo →</span>
+      </a>
+
+      <!-- 3. ADMIN BACKOFFICE -->
+      <a href="admin.html" target="_blank" class="project-card card-admin">
+        <div>
+          <div class="card-top">
+            <div class="card-icon-badge" style="background:rgba(2,132,199,0.12); color:#38bdf8;">🏢</div>
+            <span class="platform-pill" style="background:rgba(2,132,199,0.15); color:#38bdf8; border:1px solid rgba(2,132,199,0.3);">Backoffice</span>
+          </div>
+          <h3 class="card-heading">Portal Corporativo (Admin)</h3>
+          <p class="card-description">Retaguarda desacoplada com controle de acesso RBAC (Fiscal, Estoque, Suporte e Admin), telemetria dos totens e auditoria forense.</p>
+        </div>
+        <span class="card-button-footer">Acessar Painel Admin →</span>
+      </a>
+
+    </div>
+
+    <!-- SEÇÃO 2: ENGENHARIA DE SOFTWARE & MODELAGEM -->
+    <div class="section-label">📁 Engenharia de Software, Requisitos & Diagramas</div>
+    <div class="cards-grid">
+
+      <!-- 4. GOOGLE DOCS REQUISITOS -->
+      <a href="https://docs.google.com/document/d/1PkzvR2z7BI21md1zqQHluUD_XUE5MJM5t1jo1gUhnaU/edit?tab=t.0" target="_blank" rel="noopener noreferrer" class="project-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon-badge" style="background:rgba(59,130,246,0.12); color:#60a5fa;">📋</div>
+            <span class="platform-pill" style="background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3);">Google Docs</span>
+          </div>
+          <h3 class="card-heading">Documento de Requisitos (v4.0)</h3>
+          <p class="card-description">Especificação de engenharia com 52 Requisitos Funcionais, 22 RNFs na norma ISO/IEC 25010 e 19 Regras de Negócio do sistema.</p>
+        </div>
+        <span class="card-button-footer">Abrir Google Docs Oficial →</span>
+      </a>
+
+      <!-- 5. GOOGLE DRIVE DIAGRAMAS -->
+      <a href="https://drive.google.com/file/d/1yVvZs3HJW34IY5W-alrmPsHIEv3riV8Z/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="project-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon-badge" style="background:rgba(16,185,129,0.12); color:#34d399;">📐</div>
+            <span class="platform-pill" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3);">Google Drive</span>
+          </div>
+          <h3 class="card-heading">Diagramas UML Oficiais</h3>
+          <p class="card-description">Arquivo oficial no Google Drive com Diagrama de Casos de Uso com 5 atores externos, fronteiras e relações completas do sistema.</p>
+        </div>
+        <span class="card-button-footer">Acessar no Google Drive →</span>
+      </a>
+
+      <!-- 6. LUCIDCHART CLASSES -->
+      <a href="https://lucid.app/lucidchart/26cd1025-69d5-4dfe-84db-b1a770216da8/edit?viewport_loc=-2235%2C-1124%2C2658%2C1420%2C0_0&invitationId=inv_3a94cefa-3c38-4635-b2c4-1febaf1b8e10" target="_blank" rel="noopener noreferrer" class="project-card card-lucid">
+        <div>
+          <div class="card-top">
+            <div class="card-icon-badge" style="background:rgba(249,115,22,0.12); color:#fb923c;">🏗️</div>
+            <span class="platform-pill" style="background:rgba(249,115,22,0.15); color:#fb923c; border:1px solid rgba(249,115,22,0.3);">Lucidchart</span>
+          </div>
+          <h3 class="card-heading">Diagrama de Classes & Arquitetura</h3>
+          <p class="card-description">Modelagem de classes Preto e Branco com herança polimórfica, composição forte, métodos parametrizados e classes de periféricos.</p>
+        </div>
+        <span class="card-button-footer">Visualizar no Lucidchart →</span>
+      </a>
+
+      <!-- 7. FIGMA PROTÓTIPO -->
+      <a href="https://www.figma.com/design/QGv99CJPnQ3PG4MsvMXCgs/GoSelf?node-id=0-1&t=f8Lg5noVuXJ0fcvj-1" target="_blank" rel="noopener noreferrer" class="project-card card-figma">
+        <div>
+          <div class="card-top">
+            <div class="card-icon-badge" style="background:rgba(236,72,153,0.12); color:#f472b6;">🎨</div>
+            <span class="platform-pill" style="background:rgba(236,72,153,0.15); color:#f472b6; border:1px solid rgba(236,72,153,0.3);">Figma</span>
+          </div>
+          <h3 class="card-heading">Protótipo de Telas & Wireframes</h3>
+          <p class="card-description">30 wireframes de telas conectadas cobrindo desde a tela de CPF obrigatório até pesagem, pagamento e relatórios gerenciais.</p>
+        </div>
+        <span class="card-button-footer">Abrir Protótipo no Figma →</span>
+      </a>
+
+      <!-- 8. MIRO CANVAS -->
+      <a href="https://miro.com/welcomeonboard/UFpKNFBhMjdNdURQVDBBZXlyYnQ0ZVFtWXBEeTU4ZzVCN3QxSXV6YnVpSHgrRWdoM0N1TE9qMUJtb3BjL0lBZXJjZ2F4VHp0TGwrV08vOERpSnJPcnQ2SjZNSFZMVEZWWTkvQlFOOFhNdmRmeVRZM21LNVA5Wk5VNFlybm9qSlpzVXVvMm53MW9OWFg5bkJoVXZxdFhRPT0hdjE=?share_link_id=345665069584" target="_blank" rel="noopener noreferrer" class="project-card card-miro">
+        <div>
+          <div class="card-top">
+            <div class="card-icon-badge" style="background:rgba(234,179,8,0.12); color:#fde047;">💼</div>
+            <span class="platform-pill" style="background:rgba(234,179,8,0.15); color:#fde047; border:1px solid rgba(234,179,8,0.3); color:#fde047;">Miro</span>
+          </div>
+          <h3 class="card-heading">Business Model Canvas</h3>
+          <p class="card-description">Quadro estratégico no Miro com os 9 blocos do modelo de negócio: proposta de valor, canais, custos, parcerias e receita.</p>
+        </div>
+        <span class="card-button-footer">Acessar Canvas no Miro →</span>
+      </a>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <p><strong>GoSelf — Soluções de Autoatendimento para Varejo</strong> • SENAI Florianópolis / São José</p>
+      <p style="margin-top: 4px;">Desenvolvido por João A. Bernardo | Orientação: Prof. Kleber Kamers (MOSI 2026/1)</p>
+    </footer>
+
+  </div>
+
+  <div id="toast">Link copiado com sucesso!</div>
+
+  <!-- QR CODE STANDALONE ENGINE -->
+  <script>
+    (function(){
+      function QRCode(element, options) {
+        this._el = typeof element === "string" ? document.getElementById(element) : element;
+        this._htOption = {
+          width: 170,
+          height: 170,
+          colorDark: "#000000",
+          colorLight: "#ffffff"
+        };
+        if (typeof options === 'string') {
+          this._htOption.text = options;
+        } else if (options) {
+          for (var i in options) {
+            this._htOption[i] = options[i];
+          }
+        }
+        this._makeCode();
+      }
+
+      QRCode.prototype._makeCode = function() {
+        var text = encodeURIComponent(this._htOption.text || window.location.href);
+        var size = this._htOption.width;
+        this._el.innerHTML = '<img id="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&margin=10&data=' + text + '" onerror="this.onerror=null;this.src=\'qrcode_goself_alta_resolucao.png\';" alt="QR Code" style="width:' + size + 'px;height:' + size + 'px;border-radius:4px;display:block;" crossorigin="anonymous">';
+      };
+
+      QRCode.prototype.makeCode = function(text) {
+        this._htOption.text = text;
+        this._makeCode();
+      };
+
+      window.QRCode = QRCode;
+    })();
+
+    var qrInstance = null;
+    var targetInput = document.getElementById('qr-target-url');
+    var canvasContainer = document.getElementById('qrcode-canvas-container');
+
+    function initQRCode() {
+      var currentUrl = window.location.href;
+      if (currentUrl.startsWith('file://')) {
+        targetInput.value = "https://fettfuruke.github.io/GoSelf/";
+      } else {
+        targetInput.value = currentUrl;
+      }
+      
+      qrInstance = new QRCode(canvasContainer, {
+        text: targetInput.value,
+        width: 170,
+        height: 170
+      });
+    }
+
+    function updateQRFromInput() {
+      var val = targetInput.value.trim();
+      if (!val) {
+        val = window.location.href;
+        targetInput.value = val;
+      }
+      if (qrInstance) {
+        qrInstance.makeCode(val);
+        showToast("QR Code atualizado para: " + val);
+      }
+    }
+
+    function copyCurrentLink() {
+      var val = targetInput.value.trim();
+      navigator.clipboard.writeText(val).then(function() {
+        showToast("Link copiado para a área de transferência!");
+      }).catch(function() {
+        targetInput.select();
+        document.execCommand('copy');
+        showToast("Link copiado!");
+      });
+    }
+
+    function downloadQRCodePNG() {
+      var val = encodeURIComponent(targetInput.value.trim());
+      var downloadUrl = "https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&margin=20&data=" + val;
+      
+      fetch(downloadUrl)
+        .then(function(res) { return res.blob(); })
+        .then(function(blob) {
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = "GoSelf_QRCode_Oficial_Mundo_SENAI.png";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast("Download do QR Code iniciado!");
+        })
+        .catch(function() {
+          window.open(downloadUrl, '_blank');
+        });
+    }
+
+    function showToast(msg) {
+      var toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.style.display = 'block';
+      setTimeout(function() {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+
+    targetInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') updateQRFromInput();
+    });
+
+    window.addEventListener('DOMContentLoaded', initQRCode);
+  </script>
+</body>
+</html>

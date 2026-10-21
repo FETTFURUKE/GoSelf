@@ -1,0 +1,10 @@
+# Ignorar tudo exceto os arquivos oficiais da raiz
+*
+!index.html
+!sistema.html
+!admin.html
+!goself-sync.js
+!README.md
+!qrcode_goself_alta_resolucao.png
+!gerar_qrcode_local.py
+!.gitignore

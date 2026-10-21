@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoSelf — Portal de Retaguarda &amp; Backoffice Corporativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-sidebar: #1e293b;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --border-color: #e2e8f0;
+      --border-dark: #334155;
+      --brand-navy: #0f172a;
+      --brand-blue: #2563eb;
+      --brand-emerald: #10b981;
+      --brand-emerald-dark: #059669;
+      --brand-amber: #f59e0b;
+      --brand-danger: #ef4444;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #f8fafc;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08);
+      --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.1);
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* TELA DE LOGIN BLOQUEANTE DO BACKOFFICE */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 10%, #1e293b 0%, #090d16 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .login-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 38px 42px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      border: 1px solid #e2e8f0;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .login-logo {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--brand-navy);
+      letter-spacing: -0.03em;
+    }
+
+    .login-badge {
+      display: inline-block;
+      margin-top: 6px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      padding: 11px 14px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+      transition: border 0.15s;
+    }
+
+    .form-control:focus {
+      border-color: var(--brand-blue);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 13px;
+      background: var(--brand-navy);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.15s;
+    }
+
+    .btn-login:hover {
+      background: #1e293b;
+    }
+
+    /* ESTRUTURA INTERNA DO SISTEMA BACKOFFICE */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-sidebar);
+      color: var(--text-light);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--border-dark);
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      padding: 0 8px;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--brand-emerald);
+      color: #052e16;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-item button {
+      width: 100%;
+      text-align: left;
+      padding: 11px 14px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius);
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s;
+    }
+
+    .nav-item button:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+
+    .nav-item button.active {
+      background: var(--brand-blue);
+      color: #ffffff;
+    }
+
+    .nav-item button.locked {
+      opacity: 0.42;
+      cursor: not-allowed;
+      position: relative;
+    }
+
+    .nav-item button.locked:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+    }
+
+    .lock-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 800;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid #475569;
+      color: #94a3b8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .user-card {
+      background: #0f172a;
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius);
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-info {
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .user-name { font-weight: 800; color: #ffffff; }
+    .user-role { font-size: 11px; color: #94a3b8; }
+
+    .btn-logout {
+      background: transparent;
+      border: none;
+      color: #f87171;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ÁREA PRINCIPAL */
+    .content-area {
+      flex: 1;
+      padding: 28px 36px;
+      overflow-y: auto;
+      height: 100vh;
+    }
+
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--brand-navy);
+      letter-spacing: -0.02em;
+    }
+
+    .tab-section {
+      display: none;
+    }
+
+    .tab-section.active {
+      display: block;
+      animation: fadeIn 0.15s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0.6; transform: translateY(2px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CARDS E GRIDS */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--brand-navy);
+      margin-top: 6px;
+    }
+
+    .data-table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .data-table th {
+      background: #f8fafc;
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1.5px solid var(--border-color);
+      font-weight: 800;
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-action {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .btn-action:hover {
+      background: var(--brand-navy);
+      color: #ffffff;
+      border-color: var(--brand-navy);
+    }
+
+    .btn-action.success {
+      background: #ecfdf5;
+      color: #059669;
+      border-color: #a7f3d0;
+    }
+
+    .btn-action.success:hover {
+      background: #059669;
+      color: #ffffff;
+    }
+
+    .toast-box {
+      position: fixed;
+      bottom: 24px;
+      right: 28px;
+      background: var(--brand-navy);
+      color: #ffffff;
+      border-left: 4px solid var(--brand-emerald);
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      display: none;
+      z-index: 2000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TELA DE AUTENTICAÇÃO REAL DO BACKOFFICE -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">GoSelf</div>
+        <div class="login-badge">Portal Corporativo &bull; Retaguarda</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-top:8px;">
+          Acesso restrito a Fiscais de Loja, Estoquistas, Técnicos e Administradores
+        </p>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Usuário / Matrícula</label>
+          <input type="text" id="loginUser" class="form-control" placeholder="ex: fiscal.loja, estoque.chefe, suporte.ti" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Senha Corporativa</label>
+          <input type="password" id="loginPass" class="form-control" placeholder="Digite sua senha" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Perfil de Acesso</label>
+          <select id="loginRole" class="form-control" style="cursor:pointer;">
+            <option value="FISCAL">Fiscal de Loja / Supervisor</option>
+            <option value="ESTOQUE">Responsável pelo Estoque</option>
+            <option value="SUPORTE">Técnico de Suporte TI</option>
+            <option value="ADMIN">Administrador Geral</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-login">Entrar no Portal</button>
+
+        <div style="margin-top:16px; text-align:center;">
+          <a href="sistema.html" style="font-size:12px; color:var(--brand-blue); text-decoration:none; font-weight:700;">
+            &larr; Voltar ao Totem de Autoatendimento do Cliente
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- BARRA LATERAL (SIDEBAR DE NAVEGAÇÃO CORPORATIVA) -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-brand">
+        <div class="brand-mark">GS</div>
+        <div class="brand-title">GoSelf Admin</div>
+      </div>
+
+      <ul class="nav-list">
+        <li class="nav-item">
+          <button class="active" id="navMonitor" onclick="switchTab('tabMonitor')">
+            <span>📡</span> Monitor de Totens &amp; Chamados
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="navStock" onclick="switchTab('tabStock')">
+            <span>📦</span> Catálogo &amp; Estoque Mestre
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="navTech" onclick="switchTab('tabTech')">
+            <span>🛠️</span> Diagnóstico de Periféricos
+          </button>
+        </li>
+        <li class="nav-item">
+          <button id="navAudit" onclick="switchTab('tabAudit')">
+            <span>📊</span> Métricas &amp; Auditoria Forense
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="user-card">
+        <div class="user-info">
+          <div class="user-name" id="userDisplay">Operador</div>
+          <div class="user-role" id="roleDisplay">Perfil Ativo</div>
+        </div>
+        <button class="btn-logout" onclick="logout()">Sair</button>
+      </div>
+      <div style="margin-top:10px; text-align:center;">
+        <a href="sistema.html" target="_blank" style="font-size:11px; color:#94a3b8; text-decoration:none; font-weight:600;">
+          Abrir Totem em Nova Aba &rarr;
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+  <main class="content-area">
+
+    <!-- SEÇÃO 1: MONITOR DE TOTENS & FILA DE CHAMADOS (FISCAL DE LOJA) -->
+    <section class="tab-section active" id="tabMonitor">
+      <div class="top-header">
+        <div>
+          <h1 class="page-title">Monitoramento de Totens &amp; Chamados de Ajuda</h1>
+          <p style="font-size:13px; color:var(--text-muted);">Painel operacional para atendimento de clientes e liberação de divergências em tempo real</p>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-action" style="background:#fef2f2; color:#dc2626; border-color:#fca5a5;" onclick="resetAllStoreDataAdmin()">
+            🔄 Zerar Base de Testes
+          </button>
+          <button class="btn-action success" onclick="showToast('Sinalizador Andon de todos os totens sincronizado!')">
+            ✓ Sincronizar Fila
+          </button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">TOTENS EM LINHA</div>
+          <div class="kpi-value" id="kpiTotensOnline">0 / 4 Ativos</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">CHAMADOS PENDENTES</div>
+          <div class="kpi-value" style="color:var(--brand-amber);" id="kpiChamados">0 Pendentes</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">DIVERGÊNCIAS HOJE</div>
+          <div class="kpi-value" id="kpiDivergencias">0 Casos</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">STATUS OPERACIONAL</div>
+          <div class="kpi-value" style="color:var(--brand-emerald-dark);" id="kpiStatusGeral">100% Normal</div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 style="font-size:16px; font-weight:800; color:var(--brand-navy);">Monitoramento de Terminais (Telemetria ao Vivo)</h2>
+        <span style="font-size:12px; font-weight:700; color:var(--brand-emerald-dark); display:inline-flex; align-items:center; gap:6px;">
+          <span style="width:8px; height:8px; border-radius:50%; background:var(--brand-emerald); display:inline-block; box-shadow:0 0 6px var(--brand-emerald);"></span>
+          Sincronização Ativa via Barramento GoSelfSync
+        </span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:14px; margin-bottom:24px;" id="totemsStatusGrid">
+      </div>
+
+      <h2 style="font-size:16px; font-weight:800; color:var(--brand-navy); margin-bottom:12px;">Fila de Chamados Presenciais em Tempo Real</h2>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID Totem</th>
+              <th>Horário</th>
+              <th>Tipo de Ocorrência</th>
+              <th>Status Atual</th>
+              <th>Cliente Identificado</th>
+              <th>Ações do Fiscal</th>
+            </tr>
+          </thead>
+          <tbody id="chamadosRows">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: CATÁLOGO MESTRE & CONTROLE DE ESTOQUE (RESPONSÁVEL PELO ESTOQUE) -->
+    <section class="tab-section" id="tabStock">
+      <div class="top-header">
+        <div>
+          <h1 class="page-title">Catálogo de Produtos &amp; Controle de Estoque</h1>
+          <p style="font-size:13px; color:var(--text-muted);">Lista oficial de mercadorias cadastradas no sistema GoSelf (EAN-13 e PLU)</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-action" onclick="exportProductListJson()">Exportar Catálogo (JSON)</button>
+          <button class="btn-action success" onclick="openNewProductPrompt()">+ Cadastrar Novo Produto</button>
+        </div>
+      </div>
+
+      <div class="data-table-container">
+        <table class="data-table" id="masterProductTable">
+          <thead>
+            <tr>
+              <th>Cód. EAN / PLU</th>
+              <th>Descrição do Produto</th>
+              <th>Categoria</th>
+              <th>Preço Unit.</th>
+              <th>Unidade</th>
+              <th>Peso Esperado</th>
+              <th>Saldo Estoque</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="masterProductRows">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3: DIAGNÓSTICO DE HARDWARE & PERIFÉRICOS (TÉCNICO DE SUPORTE) -->
+    <section class="tab-section" id="tabTech">
+      <div class="top-header">
+        <div>
+          <h1 class="page-title">Diagnóstico Técnico de Hardware &amp; Periféricos</h1>
+          <p style="font-size:13px; color:var(--text-muted);">Monitoramento de portas COM, sensores e telemetria da Toledo Prix e Bematech</p>
+        </div>
+        <button class="btn-action success" onclick="runDiagnosticsAll()">
+          Executar Teste Geral de Periféricos
+        </button>
+      </div>
+
+      <div class="kpi-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="kpi-card">
+          <div class="kpi-label">Balança Toledo Prix 3 Fit (Porta COM3)</div>
+          <div style="margin-top:10px; font-size:13px; line-height:1.6;">
+            Protocolo Serial: <strong>Filizola / Toledo P03 (9600 bps, 8N1)</strong><br/>
+            Tolerância Anti-Perda: <strong>&plusmn; 15g (Norma MOSI)</strong><br/>
+            Zero Dinâmico: <strong style="color:var(--brand-emerald-dark);">Estável (0.000 kg)</strong><br/>
+            Tara Automática: <strong>Habilitada</strong>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn-action" onclick="showToast('Zero da balança Toledo Prix calibrado com sucesso!')">Zerar Balança</button>
+            <button class="btn-action" onclick="showToast('Peso padrão de 1,000kg aplicado para aferição de balança!')">Testar Aferição</button>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Impressora Térmica Bematech MP-4200 TH</div>
+          <div style="margin-top:10px; font-size:13px; line-height:1.6;">
+            Velocidade: <strong>250 mm/s</strong><br/>
+            Sensor de Papel: <strong style="color:var(--brand-emerald-dark);">Normal (Rolo 85%)</strong><br/>
+            Tampa: <strong>Fechada (Travada)</strong><br/>
+            Certificado A1 SEFAZ: <strong>Válido até 12/2027</strong>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn-action" onclick="showToast('Guilhotina acionada e ticket de teste impresso com sucesso!')">Testar Corte Guilhotina</button>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Pinpad TEF Criptografado (Mercado Pago / Stone)</div>
+          <div style="margin-top:10px; font-size:13px; line-height:1.6;">
+            Porta: <strong>USB 2.0 (Interface DUKPT Triple-DES)</strong><br/>
+            NFC Contactless: <strong style="color:var(--brand-emerald-dark);">Ativo (13.56 MHz)</strong><br/>
+            Leitor de Chip EMV: <strong>Pronto</strong><br/>
+            Timeout de Sessão: <strong>60 segundos</strong>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn-action" onclick="showToast('Ping TEF enviado ao Pinpad: comunicação OK!')">Ping TEF</button>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Leitor Óptico Elgin BR-520</div>
+          <div style="margin-top:10px; font-size:13px; line-height:1.6;">
+            Tecnologia: <strong>Imager 2D / 1D Linear</strong><br/>
+            Modo: <strong>Apresentação Contínua (Hands-Free)</strong><br/>
+            Bipe Sonoro: <strong>1250 Hz Habilitado</strong><br/>
+            Status: <strong style="color:var(--brand-emerald-dark);">Pronto para Leitura</strong>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn-action" onclick="showToast('Bipe de teste do leitor acionado com sucesso!')">Testar Bip Óptico</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4: MÉTRICAS EXECUTIVAS & AUDITORIA FORENSE (ADMINISTRADOR) -->
+    <section class="tab-section" id="tabAudit">
+      <div class="top-header">
+        <div>
+          <h1 class="page-title">Painel Executivo &amp; Trilha de Auditoria Forense</h1>
+          <p style="font-size:13px; color:var(--text-muted);">Registro completo de segurança, conformidade fiscal e eventos de prevenção de perdas</p>
+        </div>
+        <button class="btn-action" onclick="showToast('Relatório de auditoria exportado com sucesso!')">
+          Exportar Relatório SEFAZ / Auditoria
+        </button>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">FATURAMENTO TOTAL</div>
+          <div class="kpi-value" id="kpiFaturamentoTotal">R$ 0,00</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">NFC-E AUTORIZADAS</div>
+          <div class="kpi-value" style="color:var(--brand-emerald-dark);" id="kpiNfceCount">0 Cupons</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">CUPONS ENVIADOS POR E-MAIL</div>
+          <div class="kpi-value" style="color:var(--brand-blue);" id="kpiEmailsSent">0 E-mails</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">SATISFAÇÃO DO CLIENTE</div>
+          <div class="kpi-value" style="color:var(--brand-amber);" id="kpiNpsScore">Sem Avaliações</div>
+        </div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:800; color:var(--brand-navy); margin-bottom:12px;">Log de Auditoria Forense (Intervenções e Overrides)</h2>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Terminal</th>
+              <th>Matrícula Operador</th>
+              <th>Ação / Evento</th>
+              <th>Justificativa Obrigatória</th>
+              <th>Impacto R$</th>
+            </tr>
+          </thead>
+          <tbody id="auditMasterRows">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast-box" id="adminToast">Mensagem do Sistema</div>
+
+  <script src="goself-sync.js"></script>
+
+  <script>
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
+
+    function playAlertBeep(freq = 750, duration = 0.15, type = 'sine') {
+      try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playCallIncomingSound() {
+      playAlertBeep(700, 0.12, 'sine');
+      setTimeout(() => playAlertBeep(920, 0.25, 'sine'), 130);
+    }
+
+    function playSaleSuccessSound() {
+      playAlertBeep(523.25, 0.08, 'sine');
+      setTimeout(() => playAlertBeep(659.25, 0.08, 'sine'), 90);
+      setTimeout(() => playAlertBeep(783.99, 0.20, 'sine'), 180);
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById('adminToast');
+      box.textContent = msg;
+      box.style.display = 'block';
+      clearTimeout(window.adminToastTimer);
+      window.adminToastTimer = setTimeout(() => { box.style.display = 'none'; }, 3400);
+    }
+
+    const RBAC_ROLES = {
+      'FISCAL': {
+        name: 'Fiscal de Loja / Supervisor',
+        level: 'Nível 1 • Frente de Caixa',
+        allowedTabs: ['tabMonitor'],
+        primaryTab: 'tabMonitor',
+        deniedMsg: 'Acesso Restrito: O perfil Fiscal de Loja possui autorização exclusiva para Monitoramento de Totens e Atendimento de Chamados.'
+      },
+      'ESTOQUE': {
+        name: 'Responsável pelo Estoque',
+        level: 'Nível 2 • Almoxarifado & Catálogo',
+        allowedTabs: ['tabStock'],
+        primaryTab: 'tabStock',
+        deniedMsg: 'Acesso Restrito: O perfil Responsável pelo Estoque possui autorização exclusiva para o Catálogo Mestre e Balanço de Estoque.'
+      },
+      'SUPORTE': {
+        name: 'Técnico de Suporte TI',
+        level: 'Nível 2 • Hardware & Periféricos',
+        allowedTabs: ['tabTech'],
+        primaryTab: 'tabTech',
+        deniedMsg: 'Acesso Restrito: O perfil Técnico de Suporte possui autorização exclusiva para Diagnóstico de Periféricos, Balança e Pinpad.'
+      },
+      'ADMIN': {
+        name: 'Administrador Geral',
+        level: 'Nível 3 • Acesso Total Corporativo',
+        allowedTabs: ['tabMonitor', 'tabStock', 'tabTech', 'tabAudit'],
+        primaryTab: 'tabAudit',
+        deniedMsg: ''
+      }
+    };
+
+    let currentUserRole = 'FISCAL';
+
+    function applyRoleHierarchy(role) {
+      currentUserRole = role;
+      const config = RBAC_ROLES[role] || RBAC_ROLES['FISCAL'];
+
+      const tabToNav = {
+        'tabMonitor': 'navMonitor',
+        'tabStock': 'navStock',
+        'tabTech': 'navTech',
+        'tabAudit': 'navAudit'
+      };
+
+      Object.keys(tabToNav).forEach(tabId => {
+        const btnId = tabToNav[tabId];
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+
+        const isAllowed = config.allowedTabs.includes(tabId);
+        btn.classList.toggle('locked', !isAllowed);
+
+        const oldLock = btn.querySelector('.lock-badge');
+        if (oldLock) oldLock.remove();
+
+        if (!isAllowed) {
+          const lockSpan = document.createElement('span');
+          lockSpan.className = 'lock-badge';
+          lockSpan.textContent = '🔒 Restrito';
+          btn.appendChild(lockSpan);
+        }
+      });
+
+      document.getElementById('roleDisplay').textContent = `${config.name} (${config.level})`;
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const user = document.getElementById('loginUser').value.trim() || 'Operador';
+      const role = document.getElementById('loginRole').value;
+
+      document.getElementById('userDisplay').textContent = user;
+      document.getElementById('loginOverlay').style.display = 'none';
+
+      applyRoleHierarchy(role);
+
+      const config = RBAC_ROLES[role] || RBAC_ROLES['FISCAL'];
+      switchTab(config.primaryTab);
+
+      showToast(`Bem-vindo, ${user}! Acesso liberado ao perfil ${config.name} (${config.level}).`);
+    }
+
+    function logout() {
+      document.getElementById('loginOverlay').style.display = 'flex';
+      document.getElementById('loginPass').value = '';
+    }
+
+    function switchTab(tabId) {
+      const config = RBAC_ROLES[currentUserRole] || RBAC_ROLES['FISCAL'];
+      if (!config.allowedTabs.includes(tabId)) {
+        playAlertBeep(350, 0.22, 'sawtooth');
+        showToast(`⛔ ${config.deniedMsg}`);
+        return;
+      }
+
+      document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-list button').forEach(b => b.classList.remove('active'));
+
+      const sec = document.getElementById(tabId);
+      if (sec) sec.classList.add('active');
+
+      const btnMap = {
+        'tabMonitor': 'navMonitor',
+        'tabStock': 'navStock',
+        'tabTech': 'navTech',
+        'tabAudit': 'navAudit'
+      };
+      const activeBtn = document.getElementById(btnMap[tabId]);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (tabId === 'tabMonitor') {
+        renderTotemsGrid();
+        renderCallsQueue();
+        updateMonitorKpis();
+      }
+      if (tabId === 'tabStock') renderMasterCatalog();
+      if (tabId === 'tabAudit') {
+        renderAuditTrail();
+        updateExecutiveKpis();
+      }
+    }
+
+    function renderTotemsGrid() {
+      const container = document.getElementById('totemsStatusGrid');
+      if (!container || !window.GoSelfSync) return;
+
+      const totems = window.GoSelfSync.getTotemsState();
+      const totemKeys = ['TOTEM-01', 'TOTEM-02', 'TOTEM-03', 'TOTEM-04'];
+
+      container.innerHTML = totemKeys.map(key => {
+        const t = totems[key] || { name: key, status: 'ONLINE', andon: 'GREEN', cartCount: 0, cartTotal: 0 };
+        const isOnline = (Date.now() - (t.lastHeartbeat || 0)) < 15000;
+        
+        let andonColor = '#10b981';
+        let andonText = 'Normal';
+        let andonBorder = '#e2e8f0';
+        let statusBadge = 'Em Standby';
+        let statusColor = '#64748b';
+
+        if (t.andon === 'RED' || t.status === 'DIVERGENCIA') {
+          andonColor = '#ef4444';
+          andonText = 'Divergência / Alerta';
+          andonBorder = '#fca5a5';
+          statusBadge = '🚨 TRAVA DE BALANÇA';
+          statusColor = '#dc2626';
+        } else if (t.andon === 'YELLOW' || t.status === 'CHAMADO') {
+          andonColor = '#f59e0b';
+          andonText = 'Chamado Atendente';
+          andonBorder = '#fcd34d';
+          statusBadge = '⚠️ AJUDA SOLICITADA';
+          statusColor = '#d97706';
+        } else if (t.cartCount > 0 || t.status === 'EM_COMPRA') {
+          statusBadge = `🛒 Compra em Andamento (${t.cartCount} itens)`;
+          statusColor = '#0284c7';
+        }
+
+        const isOurKiosk = (key === 'TOTEM-03');
+
+        return `
+          <div style="background:#ffffff; border:2px solid ${andonBorder}; border-radius:12px; padding:16px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; justify-content:space-between; position:relative;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <div>
+                  <div style="font-weight:900; font-size:15px; color:var(--brand-navy); display:flex; align-items:center; gap:6px;">
+                    ${t.name || key}
+                    ${isOurKiosk ? '<span style="font-size:9px; background:#eff6ff; color:#2563eb; padding:2px 6px; border-radius:4px; font-weight:800;">TOTEM ATIVO</span>' : ''}
+                  </div>
+                  <div style="font-size:11px; font-weight:700; color:${statusColor}; margin-top:2px;">
+                    ${statusBadge}
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="font-size:10px; font-weight:800; text-transform:uppercase; color:${andonColor};">${andonText}</span>
+                  <span style="width:12px; height:12px; border-radius:50%; background:${andonColor}; box-shadow:0 0 8px ${andonColor}; display:inline-block;"></span>
+                </div>
+              </div>
+
+              <div style="background:#f8fafc; border-radius:8px; padding:10px; font-size:12px; margin-top:8px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                  <span style="color:var(--text-muted);">Carrinho:</span>
+                  <strong>${t.cartCount || 0} produto(s)</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                  <span style="color:var(--text-muted);">Subtotal Parcial:</span>
+                  <strong style="color:var(--brand-emerald-dark);">R$ ${(t.cartTotal || 0).toFixed(2).replace('.', ',')}</strong>
+                </div>
+                ${t.callReason ? `<div style="margin-top:6px; font-size:11px; color:#b45309; font-weight:700;">Motivo: ${t.callReason}</div>` : ''}
+              </div>
+            </div>
+
+            <div style="margin-top:12px; display:flex; gap:6px;">
+              ${(t.andon === 'YELLOW' || t.status === 'CHAMADO') ? `
+                <button class="btn-action success" style="flex:1; padding:6px 10px; font-size:11px;" onclick="resolverChamadoTotem('${key}')">
+                  ✓ Liberar Chamado
+                </button>
+              ` : ''}
+              ${(t.andon === 'RED' || t.status === 'DIVERGENCIA') ? `
+                <button class="btn-action" style="flex:1; padding:6px 10px; font-size:11px; background:#ef4444; color:#fff;" onclick="liberarDivergenciaRemota('${key}')">
+                  🔓 Desbloquear Balança
+                </button>
+              ` : ''}
+              ${(t.andon === 'GREEN' && t.status !== 'CHAMADO' && t.status !== 'DIVERGENCIA') ? `
+                <button class="btn-action" style="flex:1; padding:6px 10px; font-size:11px;" onclick="showToast('Sinal de ping enviado com sucesso ao terminal!')">
+                  Ping Terminal OK
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function resolverChamadoTotem(totemId) {
+      if (!window.GoSelfSync) return;
+      const calls = window.GoSelfSync.getCalls();
+      const call = calls.find(c => c.totem === totemId && c.status === 'PENDENTE');
+      const currentUser = document.getElementById('userDisplay').textContent || 'Fiscal de Loja';
+      
+      if (call) {
+        window.GoSelfSync.resolveCall(call.id, currentUser);
+      } else {
+        window.GoSelfSync.updateTotemState(totemId, { status: 'ONLINE', andon: 'GREEN' });
+        window.GoSelfSync.publish('CALL_RESOLVED', { totem: totemId, operator: currentUser });
+      }
+      
+      showToast(`Chamado do ${totemId} finalizado pelo ${currentUser}! Totem liberado.`);
+      renderTotemsGrid();
+      renderCallsQueue();
+    }
+
+    function liberarDivergenciaRemota(totemId) {
+      if (!window.GoSelfSync) return;
+      const currentUser = document.getElementById('userDisplay').textContent || 'Fiscal de Loja';
+      window.GoSelfSync.remoteUnlockTotem(totemId, currentUser);
+      showToast(`Divergência do ${totemId} liberada remotamente com sucesso!`);
+      renderTotemsGrid();
+      renderCallsQueue();
+    }
+
+    function renderCallsQueue() {
+      const tbody = document.getElementById('chamadosRows');
+      if (!tbody || !window.GoSelfSync) return;
+
+      const calls = window.GoSelfSync.getCalls();
+      const pendentes = calls.filter(c => c.status === 'PENDENTE');
+      document.getElementById('kpiChamados').textContent = `${pendentes.length} Chamado${pendentes.length === 1 ? '' : 's'}`;
+
+      if (calls.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted);">Nenhum chamado de cliente no momento.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = calls.map(c => `
+        <tr>
+          <td><strong style="color:var(--brand-navy);">${c.totem}</strong></td>
+          <td>${c.time}</td>
+          <td>${c.reason}</td>
+          <td>
+            ${c.status === 'PENDENTE'
+              ? '<span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:4px; font-weight:700;">Aguardando Atendente</span>'
+              : '<span style="background:#ecfdf5; color:#059669; padding:3px 8px; border-radius:4px; font-weight:700;">Concluído</span>'
+            }
+          </td>
+          <td>${c.cpf || 'Consumidor Balcão'}</td>
+          <td>
+            ${c.status === 'PENDENTE'
+              ? `<button class="btn-action success" onclick="atenderChamado('${c.id}', '${c.totem}')">Atender / Liberar</button>`
+              : `<span style="font-size:11px; color:var(--text-muted); font-weight:700;">Liberado por ${c.operator || 'Fiscal'}</span>`
+            }
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function atenderChamado(callId, totemId) {
+      const currentUser = document.getElementById('userDisplay').textContent || 'Fiscal de Loja';
+      if (window.GoSelfSync) {
+        window.GoSelfSync.resolveCall(callId, currentUser);
+      }
+      showToast(`Chamado de atendimento [${callId}] concluído no ${totemId}!`);
+      renderCallsQueue();
+      renderTotemsGrid();
+    }
+
+    function renderMasterCatalog() {
+      const tbody = document.getElementById('masterProductRows');
+      if (!tbody || !window.GoSelfSync) return;
+
+      const catalog = window.GoSelfSync.getCatalog();
+      tbody.innerHTML = catalog.map(p => `
+        <tr>
+          <td><strong style="font-family:'JetBrains Mono',monospace;">${p.code}</strong></td>
+          <td>${p.name}</td>
+          <td><span style="background:#f1f5f9; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700;">${p.category}</span></td>
+          <td style="font-weight:700;">R$ ${p.price.toFixed(2).replace('.', ',')}</td>
+          <td>${p.unit}</td>
+          <td>${p.pesavel ? 'Pesável Balança' : ((p.weightNominal || 0.1).toFixed(3).replace('.', ',') + ' kg')}</td>
+          <td><strong style="color:var(--brand-emerald-dark);">${p.stock} ${p.unit}</strong></td>
+          <td>
+            <button class="btn-action" onclick="restockItemByCode('${p.code}')">+ Repor 50</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function restockItemByCode(code) {
+      if (!window.GoSelfSync) return;
+      const updated = window.GoSelfSync.restockProduct(code, 50);
+      if (updated) {
+        renderMasterCatalog();
+        showToast(`Estoque de "${updated.name}" abastecido (+50). Novo saldo: ${updated.stock} ${updated.unit}`);
+      }
+    }
+
+    function openNewProductPrompt() {
+      const name = prompt('Nome do novo produto para cadastrar no catálogo GoSelf:');
+      if (!name || !name.trim()) return;
+      const priceStr = prompt(`Preço unitário de "${name.trim()}" (ex: 15.90):`);
+      if (!priceStr) return;
+      const price = parseFloat(priceStr.replace(',', '.')) || 9.90;
+      const code = String(Math.floor(30000 + Math.random() * 60000));
+
+      const catalog = window.GoSelfSync.getCatalog();
+      catalog.unshift({
+        code: code,
+        name: name.trim(),
+        category: 'MERCEARIA',
+        price: price,
+        unit: 'uni',
+        weightNominal: 0.500,
+        pesavel: false,
+        isAlcohol: false,
+        stock: 100
+      });
+
+      window.GoSelfSync.saveCatalog(catalog);
+      renderMasterCatalog();
+      showToast(`Produto [${code}] ${name.trim()} cadastrado com sucesso e sincronizado com os totens!`);
+    }
+
+    function exportProductListJson() {
+      const catalog = window.GoSelfSync ? window.GoSelfSync.getCatalog() : [];
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(catalog, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "GoSelf_Catalogo_Mestre_Produtos.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Arquivo JSON do Catálogo Mestre baixado com sucesso!');
+    }
+
+    function renderAuditTrail() {
+      const tbody = document.getElementById('auditMasterRows');
+      if (!tbody || !window.GoSelfSync) return;
+
+      const logs = window.GoSelfSync.getAuditLogs();
+      if (!logs || logs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted);">Nenhuma intervenção registrada na sessão atual. Tudo operando 100% automático.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = logs.map(l => `
+        <tr>
+          <td>${l.timestamp}</td>
+          <td><strong style="color:var(--brand-navy);">${l.totem}</strong></td>
+          <td>${l.operator}</td>
+          <td>${l.action}</td>
+          <td>${l.details}</td>
+          <td style="font-weight:700;">${l.value}</td>
+        </tr>
+      `).join('');
+    }
+
+    function updateMonitorKpis() {
+      if (!window.GoSelfSync) return;
+      const totems = window.GoSelfSync.getTotemsState();
+      const calls = window.GoSelfSync.getCalls();
+      const logs = window.GoSelfSync.getAuditLogs();
+
+      const now = Date.now();
+      const totemKeys = Object.keys(totems);
+      const onlineCount = totemKeys.filter(k => (now - (totems[k].lastHeartbeat || 0)) < 30000 || totems[k].status === 'STANDBY').length;
+      const lblTotens = document.getElementById('kpiTotensOnline');
+      if (lblTotens) lblTotens.textContent = `${onlineCount} / ${totemKeys.length || 4} Ativos`;
+
+      const pendentes = calls.filter(c => c.status === 'PENDENTE').length;
+      const lblChamados = document.getElementById('kpiChamados');
+      if (lblChamados) lblChamados.textContent = `${pendentes} Pendente${pendentes === 1 ? '' : 's'}`;
+
+      const divergencias = logs.filter(l => (l.action || '').toLowerCase().includes('divergência')).length;
+      const lblDiv = document.getElementById('kpiDivergencias');
+      if (lblDiv) lblDiv.textContent = `${divergencias} Caso${divergencias === 1 ? '' : 's'}`;
+
+      const hasAlarm = totemKeys.some(k => totems[k].andon === 'RED' || totems[k].status === 'DIVERGENCIA');
+      const lblStatus = document.getElementById('kpiStatusGeral');
+      if (lblStatus) {
+        if (hasAlarm) {
+          lblStatus.textContent = '🚨 Alerta Balança';
+          lblStatus.style.color = 'var(--brand-danger)';
+        } else if (pendentes > 0) {
+          lblStatus.textContent = '⚠️ Chamado Ativo';
+          lblStatus.style.color = 'var(--brand-amber)';
+        } else {
+          lblStatus.textContent = '100% Normal';
+          lblStatus.style.color = 'var(--brand-emerald-dark)';
+        }
+      }
+    }
+
+    function updateExecutiveKpis() {
+      if (!window.GoSelfSync) return;
+      const sales = window.GoSelfSync.getSales();
+      const logs = window.GoSelfSync.getAuditLogs();
+
+      const totalFaturamento = sales.reduce((acc, s) => acc + (s.total || 0), 0);
+      const countVendas = sales.length;
+      const emailsCount = logs.filter(l => (l.action || '').toLowerCase().includes('e-mail')).length;
+
+      const lblFat = document.getElementById('kpiFaturamentoTotal');
+      if (lblFat) lblFat.textContent = 'R$ ' + totalFaturamento.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const lblNfce = document.getElementById('kpiNfceCount');
+      if (lblNfce) lblNfce.textContent = `${countVendas} Cupom${countVendas === 1 ? '' : 's'}`;
+
+      const lblEmails = document.getElementById('kpiEmailsSent');
+      if (lblEmails) lblEmails.textContent = `${emailsCount} E-mail${emailsCount === 1 ? '' : 's'}`;
+
+      const lblNps = document.getElementById('kpiNpsScore');
+      if (lblNps) {
+        lblNps.textContent = countVendas > 0 ? '5,0 / 5,0 ★' : 'Sem Avaliações';
+      }
+    }
+
+    function resetAllStoreDataAdmin() {
+      if (!confirm('Deseja realmente zerar todos os chamados, vendas e histórico de auditoria para iniciar uma demonstração 100% limpa em tempo real?')) return;
+      if (window.GoSelfSync) {
+        window.GoSelfSync.resetAllStoreData();
+      }
+      renderTotemsGrid();
+      renderCallsQueue();
+      renderAuditTrail();
+      updateMonitorKpis();
+      updateExecutiveKpis();
+      showToast('Base reiniciada! Dados zerados para início limpo em tempo real.');
+    }
+
+    function runDiagnosticsAll() {
+      showToast('Diagnóstico concluído: Balança COM3, Impressora MP-4200, Pinpad TEF e Leitor 100% OK!');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTotemsGrid();
+      renderCallsQueue();
+      renderMasterCatalog();
+      renderAuditTrail();
+      updateMonitorKpis();
+      updateExecutiveKpis();
+
+      if (window.GoSelfSync) {
+        window.GoSelfSync.subscribe('CALL_CREATED', (call) => {
+          playCallIncomingSound();
+          showToast(`🔔 Novo Chamado de Ajuda no ${call.totem}: "${call.reason}"`);
+          renderCallsQueue();
+          renderTotemsGrid();
+          updateMonitorKpis();
+        });
+
+        window.GoSelfSync.subscribe('CALL_CANCELLED', (call) => {
+          showToast(`Chamado do ${call.totem} cancelado pelo cliente.`);
+          renderCallsQueue();
+          renderTotemsGrid();
+          updateMonitorKpis();
+        });
+
+        window.GoSelfSync.subscribe('DIVERGENCE_TRIGGERED', (data) => {
+          playCallIncomingSound();
+          showToast(`🚨 ALERTA: Divergência de Balança no ${data.totem}!`);
+          renderTotemsGrid();
+          renderCallsQueue();
+          updateMonitorKpis();
+        });
+
+        window.GoSelfSync.subscribe('SALE_COMPLETED', (sale) => {
+          playSaleSuccessSound();
+          showToast(`🎉 Venda Concluída no ${sale.totem}! Total: R$ ${sale.total.toFixed(2).replace('.', ',')} (${sale.paymentMode})`);
+          renderMasterCatalog();
+          renderAuditTrail();
+          updateExecutiveKpis();
+          renderTotemsGrid();
+          updateMonitorKpis();
+        });
+
+        window.GoSelfSync.subscribe('EMAIL_RECEIPT_SENT', (data) => {
+          playSaleSuccessSound();
+          showToast(`📧 Cupom NFC-e do ${data.totem} enviado para ${data.email}!`);
+          renderAuditTrail();
+          updateExecutiveKpis();
+        });
+
+        window.GoSelfSync.subscribe('TOTEM_STATE_CHANGED', () => {
+          renderTotemsGrid();
+          updateMonitorKpis();
+        });
+
+        window.GoSelfSync.subscribe('CATALOG_UPDATED', () => {
+          renderMasterCatalog();
+        });
+
+        window.GoSelfSync.subscribe('STORE_RESET', () => {
+          renderTotemsGrid();
+          renderCallsQueue();
+          renderMasterCatalog();
+          renderAuditTrail();
+          updateMonitorKpis();
+          updateExecutiveKpis();
+        });
+
+        setInterval(() => {
+          renderTotemsGrid();
+          updateMonitorKpis();
+          updateExecutiveKpis();
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
